@@ -1,6 +1,6 @@
 # BPMN Process Modeling — Assignment Submission
 
-This repository contains three BPMN 2.0 process models, built using the basic BPMN building blocks: **Start Events**, **Tasks**, **Exclusive Gateways**, and **End Events**. Each model is a standalone `.bpmn` file (valid BPMN 2.0 XML) that can be opened and edited in any standard BPMN tool — e.g. [Camunda Modeler]
+The repository includes the original three introductory BPMN 2.0 models below, plus two Camunda 8 executable assignment models. The `ex3/` folder contains **Assignment 1: Student Project Approval & Allocation** and **Assignment 2: Logistics & Shipment Exception Management**, with failure path registers and Camunda 8 execution notes in its README. The `.bpmn` files open in Camunda Modeler.
 
 ## Repository Structure
 
@@ -8,7 +8,11 @@ This repository contains three BPMN 2.0 process models, built using the basic BP
 ├── README.md
 ├── scenario1_leave_approval.bpmn
 ├── scenario2_purchase_order.bpmn
-└── scenario3_it_service_request.bpmn
+├── scenario3_it_service_request.bpmn
+└── ex3/
+    ├── README.md
+    ├── assignment1_student_project_approval.bpmn
+    └── assignment2_logistics_shipment_exception.bpmn
 ```
 
 ---
