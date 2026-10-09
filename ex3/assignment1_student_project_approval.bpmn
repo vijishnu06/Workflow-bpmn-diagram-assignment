@@ -1,0 +1,1351 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="Definitions_StudentProjectApproval" targetNamespace="https://example.org/camunda8/bpmn" exporter="Camunda Modeler" exporterVersion="5.XX">
+  <bpmn:collaboration id="Collaboration_StudentProjectApproval">
+    <bpmn:participant id="Participant_Main" name="Student Project Approval &amp; Allocation System" processRef="Process_StudentProjectApproval" />
+  </bpmn:collaboration>
+  <bpmn:message id="Message_GuideAccepted" name="guide-allocation-accepted">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="= proposalId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_GuideDeclined" name="guide-allocation-declined">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="= proposalId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:message id="Message_ProjectWithdrawn" name="project-allocation-withdrawn">
+    <bpmn:extensionElements>
+      <zeebe:subscription correlationKey="= proposalId" />
+    </bpmn:extensionElements>
+  </bpmn:message>
+  <bpmn:error id="Error_NotifyFailed" name="Notification or allocation record failed" errorCode="NOTIFY_OR_RECORD_FAILED" />
+  <bpmn:process id="Process_StudentProjectApproval" name="Student Project Approval &amp; Allocation System" isExecutable="true">
+    <bpmn:laneSet id="LaneSet_StudentProjectApproval">
+      <bpmn:lane id="Lane_Student" name="Student / Team">
+        <bpmn:flowNodeRef>Start_Submit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Submit_Proposal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Timer_SubmissionDeadline</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Resubmit_Proposal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_InvalidTeam</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Revise_Topic</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Duplicate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Revise_Proposal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Timer_RevisionSLA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Submit_NewTopic</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Rejected</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Lapsed</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Coordinator" name="Project Coordinator">
+        <bpmn:flowNodeRef>Late_Request</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Late_Decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Escalate_InvalidForm</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>InvalidForm_Decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Screen_Proposal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Review_Similarity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Similarity_Outcome</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Manual_GuidePlan</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Manual_Plan_Decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Manual_AfterDeclines</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Manual_Guide_Decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Manual_Notify</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Committee" name="Review Committee (incl. HoD)">
+        <bpmn:flowNodeRef>Committee_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Timer_ReviewSLA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Escalate_Review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Committee_Decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Revision_Limit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Final_Committee_Vote</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Final_Decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Rejected_Decision</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_Guide" name="Faculty Guide">
+        <bpmn:flowNodeRef>Catch_GuideAccepted</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Catch_GuideDeclined</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Catch_GuideTimeout</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Catch_Withdrawal</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Lane_System" name="Project Management System">
+        <bpmn:flowNodeRef>Validate_Proposal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Validation_Decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Send_ValidationErrors</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_ValidationClosed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Notify_InvalidTeam</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Check_Similarity</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Similarity_Decision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Send_ReviewReminder</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Wait_SecondSLA</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_ReviewEscalated</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Notify_RevisionLapsed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_RevisionLapsed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Increment_Revision</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Send_Rejection</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Mark_NewTopic</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Match_Guide</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Guide_Available</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Guide_Waitlist_Timer</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Allocate_Guide</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Compensation_Allocate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Release_GuideSlot</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Send_GuideRequest</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Await_GuideResponse</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Exclude_DeclinedGuide</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Guide_AttemptLimit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_NoGuide</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Notify_Student</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Notify_Error</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Allocated</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Compensate_Withdrawal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Notify_Withdrawal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>End_Withdrawn</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start_Submit" name="Proposal submission started">
+      <bpmn:outgoing>F_StartSubmit</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:userTask id="Submit_Proposal" name="Submit project proposal">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_StartSubmit</bpmn:incoming>
+      <bpmn:outgoing>F_SubmitValidate</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="Timer_SubmissionDeadline" name="Proposal deadline" attachedToRef="Submit_Proposal" cancelActivity="true">
+      <bpmn:outgoing>F_TimerLate</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>P14D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="Late_Request" name="Request late submission">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_TimerLate</bpmn:incoming>
+      <bpmn:outgoing>F_LateDecision</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Late_Decision" name="Late submission approved?" default="F_LateRejected">
+      <bpmn:incoming>F_LateDecision</bpmn:incoming>
+      <bpmn:outgoing>F_LateApproved</bpmn:outgoing>
+      <bpmn:outgoing>F_LateRejected</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:serviceTask id="Validate_Proposal" name="Validate form and team rules">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="validate-proposal" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_SubmitValidate</bpmn:incoming>
+      <bpmn:outgoing>F_ValidateGateway</bpmn:outgoing>
+      <bpmn:incoming>F_ResubmitValidate</bpmn:incoming>
+      <bpmn:incoming>F_MarkNewTopicToValidate</bpmn:incoming>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Validation_Decision" name="Submission valid?" default="F_Valid">
+      <bpmn:incoming>F_ValidateGateway</bpmn:incoming>
+      <bpmn:outgoing>F_InvalidForm</bpmn:outgoing>
+      <bpmn:outgoing>F_TooManyFormErrors</bpmn:outgoing>
+      <bpmn:outgoing>F_InvalidTeam</bpmn:outgoing>
+      <bpmn:outgoing>F_Valid</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="Send_ValidationErrors" name="Send errors and resubmission checklist">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="send-proposal-feedback" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_InvalidForm</bpmn:incoming>
+      <bpmn:outgoing>F_ValidationFeedback</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:userTask id="Resubmit_Proposal" name="Correct and resubmit proposal">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_ValidationFeedback</bpmn:incoming>
+      <bpmn:outgoing>F_ResubmitValidate</bpmn:outgoing>
+      <bpmn:incoming>F_LateApproved</bpmn:incoming>
+    </bpmn:userTask>
+    <bpmn:userTask id="Escalate_InvalidForm" name="Resolve repeated form errors">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_TooManyFormErrors</bpmn:incoming>
+      <bpmn:outgoing>F_CoordFormGateway</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="InvalidForm_Decision" name="Can coordinator resolve?" default="F_FormClosed">
+      <bpmn:incoming>F_CoordFormGateway</bpmn:incoming>
+      <bpmn:outgoing>F_FormResolved</bpmn:outgoing>
+      <bpmn:outgoing>F_FormClosed</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_ValidationClosed" name="Closed: validation unresolved">
+      <bpmn:incoming>F_FormClosed</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_InvalidTeam" name="Closed: invalid team">
+      <bpmn:incoming>F_NotifyInvalidTeam</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sendTask id="Notify_InvalidTeam" name="Explain team-rule rejection">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="send-proposal-feedback" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_InvalidTeam</bpmn:incoming>
+      <bpmn:outgoing>F_NotifyInvalidTeam</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:userTask id="Screen_Proposal" name="Screen proposal and domain fit">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_Valid</bpmn:incoming>
+      <bpmn:incoming>F_FormResolved</bpmn:incoming>
+      <bpmn:outgoing>F_ScreenSimilarity</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Check_Similarity" name="Check topic similarity and duplicates">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="check-topic-similarity" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_ScreenSimilarity</bpmn:incoming>
+      <bpmn:outgoing>F_SimilarityGateway</bpmn:outgoing>
+      <bpmn:incoming>F_ModifiedTopicCheck</bpmn:incoming>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Similarity_Decision" name="Similarity within threshold?" default="F_Similar">
+      <bpmn:incoming>F_SimilarityGateway</bpmn:incoming>
+      <bpmn:outgoing>F_SimilarityLow</bpmn:outgoing>
+      <bpmn:outgoing>F_Similar</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Review_Similarity" name="Review high-similarity report">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_Similar</bpmn:incoming>
+      <bpmn:outgoing>F_ReviewSimilarityOutcome</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Similarity_Outcome" name="Similarity review outcome?" default="F_SimDuplicate">
+      <bpmn:incoming>F_ReviewSimilarityOutcome</bpmn:incoming>
+      <bpmn:outgoing>F_SimClear</bpmn:outgoing>
+      <bpmn:outgoing>F_SimModify</bpmn:outgoing>
+      <bpmn:outgoing>F_SimDuplicate</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Revise_Topic" name="Submit modified topic">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_SimModify</bpmn:incoming>
+      <bpmn:outgoing>F_ModifiedTopicCheck</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Duplicate" name="Closed: duplicate topic">
+      <bpmn:incoming>F_SimDuplicate</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:userTask id="Committee_Review" name="Evaluate proposal">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_SimilarityLow</bpmn:incoming>
+      <bpmn:incoming>F_SimClear</bpmn:incoming>
+      <bpmn:outgoing>F_CommitteeToDecision</bpmn:outgoing>
+      <bpmn:incoming>F_CountToCommittee</bpmn:incoming>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="Timer_ReviewSLA" name="Review SLA reminder" attachedToRef="Committee_Review" cancelActivity="false">
+      <bpmn:outgoing>F_ReviewSLA</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>P2D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sendTask id="Send_ReviewReminder" name="Remind committee and HoD">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="send-review-reminder" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_ReviewSLA</bpmn:incoming>
+      <bpmn:outgoing>F_SendReviewReminder</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:intermediateCatchEvent id="Wait_SecondSLA" name="Second SLA interval">
+      <bpmn:incoming>F_SendReviewReminder</bpmn:incoming>
+      <bpmn:outgoing>F_SecondReviewSLA</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>P1D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:userTask id="Escalate_Review" name="Escalate overdue review to HoD">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_SecondReviewSLA</bpmn:incoming>
+      <bpmn:outgoing>F_EscalateReviewEnd</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_ReviewEscalated" name="Review escalation recorded">
+      <bpmn:incoming>F_EscalateReviewEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Committee_Decision" name="Committee decision?" default="F_CommitteeReject">
+      <bpmn:incoming>F_CommitteeToDecision</bpmn:incoming>
+      <bpmn:outgoing>F_CommitteeApprove</bpmn:outgoing>
+      <bpmn:outgoing>F_CommitteeRevise</bpmn:outgoing>
+      <bpmn:outgoing>F_CommitteeReject</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Revision_Limit" name="F5: revision cycles remaining?" default="F_RevisionFinal">
+      <bpmn:incoming>F_CommitteeRevise</bpmn:incoming>
+      <bpmn:outgoing>F_RevisionAllowed</bpmn:outgoing>
+      <bpmn:outgoing>F_RevisionFinal</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Revise_Proposal" name="Revise proposal (7-day SLA)">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_RevisionAllowed</bpmn:incoming>
+      <bpmn:outgoing>F_RevisionToCount</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:boundaryEvent id="Timer_RevisionSLA" name="Revision overdue" attachedToRef="Revise_Proposal" cancelActivity="true">
+      <bpmn:outgoing>F_RevisionTimer</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>P7D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+    <bpmn:sendTask id="Notify_RevisionLapsed" name="Notify revision overdue and close">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="notify-proposal-lapsed" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_RevisionTimer</bpmn:incoming>
+      <bpmn:outgoing>F_RevisionOverdue</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="End_RevisionLapsed" name="Closed: revision lapsed">
+      <bpmn:incoming>F_RevisionOverdue</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Increment_Revision" name="Increment revision cycle">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="increment-revision-cycle" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_RevisionToCount</bpmn:incoming>
+      <bpmn:outgoing>F_CountToCommittee</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:userTask id="Final_Committee_Vote" name="Final committee approve / reject">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_RevisionFinal</bpmn:incoming>
+      <bpmn:outgoing>F_FinalVoteDecision</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Final_Decision" name="Final decision?" default="F_FinalReject">
+      <bpmn:incoming>F_FinalVoteDecision</bpmn:incoming>
+      <bpmn:outgoing>F_FinalApproved</bpmn:outgoing>
+      <bpmn:outgoing>F_FinalReject</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="Rejected_Decision" name="New topic submission still available?" default="F_RejectedFinal">
+      <bpmn:incoming>F_CommitteeReject</bpmn:incoming>
+      <bpmn:incoming>F_FinalReject</bpmn:incoming>
+      <bpmn:outgoing>F_OneNewTopic</bpmn:outgoing>
+      <bpmn:outgoing>F_RejectedFinal</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sendTask id="Send_Rejection" name="Send rejection reasons">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="send-proposal-feedback" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_OneNewTopic</bpmn:incoming>
+      <bpmn:outgoing>F_SendRejectionToTopic</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:userTask id="Submit_NewTopic" name="Submit one new topic">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_SendRejectionToTopic</bpmn:incoming>
+      <bpmn:outgoing>F_NewTopicToMark</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="Mark_NewTopic" name="Record new-topic allowance used">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="record-new-topic" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_NewTopicToMark</bpmn:incoming>
+      <bpmn:outgoing>F_MarkNewTopicToValidate</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="End_Rejected" name="Closed: proposal rejected">
+      <bpmn:incoming>F_RejectedFinal</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:businessRuleTask id="Match_Guide" name="Match guide by domain and workload">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="match-faculty-guide" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_CommitteeApprove</bpmn:incoming>
+      <bpmn:incoming>F_FinalApproved</bpmn:incoming>
+      <bpmn:outgoing>F_GuideMatchToAvailable</bpmn:outgoing>
+      <bpmn:incoming>F_WaitlistRematch</bpmn:incoming>
+      <bpmn:incoming>F_Rematch</bpmn:incoming>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="Guide_Available" name="Matching guide available?" default="F_NoGuide">
+      <bpmn:incoming>F_GuideMatchToAvailable</bpmn:incoming>
+      <bpmn:outgoing>F_GuideFound</bpmn:outgoing>
+      <bpmn:outgoing>F_NoGuide</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Manual_GuidePlan" name="Choose manual guide, co-guide or waitlist">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_NoGuide</bpmn:incoming>
+      <bpmn:outgoing>F_ManualGuidePlan</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Manual_Plan_Decision" name="Guide allocation plan?" default="F_PlanManualAllocate">
+      <bpmn:incoming>F_ManualGuidePlan</bpmn:incoming>
+      <bpmn:outgoing>F_PlanWaitlist</bpmn:outgoing>
+      <bpmn:outgoing>F_PlanManualAllocate</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:intermediateCatchEvent id="Guide_Waitlist_Timer" name="Waitlist review interval">
+      <bpmn:incoming>F_PlanWaitlist</bpmn:incoming>
+      <bpmn:outgoing>F_WaitlistRematch</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>P7D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Allocate_Guide" name="Allocate guide in project system">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="allocate-faculty-guide" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_GuideFound</bpmn:incoming>
+      <bpmn:incoming>F_PlanManualAllocate</bpmn:incoming>
+      <bpmn:outgoing>F_AllocatedToSendRequest</bpmn:outgoing>
+      <bpmn:incoming>F_ManualGuideAvailable</bpmn:incoming>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Compensation_Allocate" name="Guide-slot compensation handler" attachedToRef="Allocate_Guide" cancelActivity="false">
+      <bpmn:compensateEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:serviceTask id="Release_GuideSlot" name="Release reserved guide slot" isForCompensation="true">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="release-faculty-guide-slot" retries="3" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sendTask id="Send_GuideRequest" name="Send allocation request to guide">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="send-guide-allocation" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_AllocatedToSendRequest</bpmn:incoming>
+      <bpmn:outgoing>F_GuideRequestToWait</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:eventBasedGateway id="Await_GuideResponse" name="Guide accepts, declines, times out or withdraws?">
+      <bpmn:incoming>F_GuideRequestToWait</bpmn:incoming>
+      <bpmn:outgoing>F_WaitAccepted</bpmn:outgoing>
+      <bpmn:outgoing>F_WaitDeclined</bpmn:outgoing>
+      <bpmn:outgoing>F_WaitTimeout</bpmn:outgoing>
+      <bpmn:outgoing>F_WaitWithdraw</bpmn:outgoing>
+    </bpmn:eventBasedGateway>
+    <bpmn:intermediateCatchEvent id="Catch_GuideAccepted" name="F9: Guide accepts">
+      <bpmn:incoming>F_WaitAccepted</bpmn:incoming>
+      <bpmn:outgoing>F_GuideAcceptedNotify</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="Message_GuideAccepted" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="Catch_GuideDeclined" name="F9: Guide declines">
+      <bpmn:incoming>F_WaitDeclined</bpmn:incoming>
+      <bpmn:outgoing>F_GuideDeclinedCount</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="Message_GuideDeclined" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="Catch_GuideTimeout" name="F9: No guide response in 3 days">
+      <bpmn:incoming>F_WaitTimeout</bpmn:incoming>
+      <bpmn:outgoing>F_GuideTimeoutCount</bpmn:outgoing>
+      <bpmn:timerEventDefinition>
+        <bpmn:timeDuration>P3D</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:intermediateCatchEvent id="Catch_Withdrawal" name="F11: Team withdraws after approval">
+      <bpmn:incoming>F_WaitWithdraw</bpmn:incoming>
+      <bpmn:outgoing>F_WithdrawalCompensate</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="Message_ProjectWithdrawn" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:serviceTask id="Exclude_DeclinedGuide" name="Exclude guide and increment attempt">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="exclude-guide-and-count" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_GuideDeclinedCount</bpmn:incoming>
+      <bpmn:incoming>F_GuideTimeoutCount</bpmn:incoming>
+      <bpmn:outgoing>F_ExcludeToLimit</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="Guide_AttemptLimit" name="F9: fewer than 3 guide attempts?" default="F_ManualGuide">
+      <bpmn:incoming>F_ExcludeToLimit</bpmn:incoming>
+      <bpmn:outgoing>F_Rematch</bpmn:outgoing>
+      <bpmn:outgoing>F_ManualGuide</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="Manual_AfterDeclines" name="Coordinator resolves guide refusal">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_ManualGuide</bpmn:incoming>
+      <bpmn:outgoing>F_ManualResolveDecision</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="Manual_Guide_Decision" name="Manual guide available?" default="F_NoGuideEnd">
+      <bpmn:incoming>F_ManualResolveDecision</bpmn:incoming>
+      <bpmn:outgoing>F_ManualGuideAvailable</bpmn:outgoing>
+      <bpmn:outgoing>F_NoGuideEnd</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="End_NoGuide" name="Closed: no guide available">
+      <bpmn:incoming>F_NoGuideEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="Notify_Student" name="Notify student and record allocation">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="notify-student-record-guide" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_GuideAcceptedNotify</bpmn:incoming>
+      <bpmn:outgoing>F_NotifySuccess</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:boundaryEvent id="Notify_Error" name="F10: Notification / database error" attachedToRef="Notify_Student" cancelActivity="true">
+      <bpmn:outgoing>F_NotifyError</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="Error_NotifyFailed" />
+    </bpmn:boundaryEvent>
+    <bpmn:userTask id="Manual_Notify" name="F10: Notify student and record manually">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_NotifyError</bpmn:incoming>
+      <bpmn:outgoing>F_ManualNotifySuccess</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="End_Allocated" name="Project and guide allocation confirmed">
+      <bpmn:incoming>F_NotifySuccess</bpmn:incoming>
+      <bpmn:incoming>F_ManualNotifySuccess</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:intermediateThrowEvent id="Compensate_Withdrawal" name="Compensate reserved guide slot">
+      <bpmn:incoming>F_WithdrawalCompensate</bpmn:incoming>
+      <bpmn:outgoing>F_WithdrawalNotify</bpmn:outgoing>
+      <bpmn:compensateEventDefinition activityRef="Allocate_Guide" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:sendTask id="Notify_Withdrawal" name="Record withdrawal and notify parties">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="notify-allocation-withdrawal" retries="3" />
+      </bpmn:extensionElements>
+      <bpmn:incoming>F_WithdrawalNotify</bpmn:incoming>
+      <bpmn:outgoing>F_WithdrawalEnd</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:endEvent id="End_Withdrawn" name="Closed: team withdrawn">
+      <bpmn:incoming>F_WithdrawalEnd</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="End_Lapsed" name="Closed: submission deadline">
+      <bpmn:incoming>F_LateRejected</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="F_StartSubmit" sourceRef="Start_Submit" targetRef="Submit_Proposal" />
+    <bpmn:sequenceFlow id="F_SubmitValidate" sourceRef="Submit_Proposal" targetRef="Validate_Proposal" />
+    <bpmn:sequenceFlow id="F_ValidateGateway" sourceRef="Validate_Proposal" targetRef="Validation_Decision" />
+    <bpmn:sequenceFlow id="F_InvalidForm" sourceRef="Validation_Decision" targetRef="Send_ValidationErrors" name="F1: incomplete or invalid form">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= formValid = false and teamRulesValid = true and proposalAttempts &lt; 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_TooManyFormErrors" sourceRef="Validation_Decision" targetRef="Escalate_InvalidForm" name="F1: coordinator escalation after 2 attempts">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= formValid = false and teamRulesValid = true and proposalAttempts &gt;= 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_InvalidTeam" sourceRef="Validation_Decision" targetRef="Notify_InvalidTeam" name="F2: invalid team rules">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= teamRulesValid = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Valid" sourceRef="Validation_Decision" targetRef="Screen_Proposal" name="Valid submission" />
+    <bpmn:sequenceFlow id="F_ValidationFeedback" sourceRef="Send_ValidationErrors" targetRef="Resubmit_Proposal" />
+    <bpmn:sequenceFlow id="F_ResubmitValidate" sourceRef="Resubmit_Proposal" targetRef="Validate_Proposal" />
+    <bpmn:sequenceFlow id="F_CoordFormGateway" sourceRef="Escalate_InvalidForm" targetRef="InvalidForm_Decision" />
+    <bpmn:sequenceFlow id="F_FormResolved" sourceRef="InvalidForm_Decision" targetRef="Screen_Proposal" name="Coordinator resolved">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= formExceptionResolved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_FormClosed" sourceRef="InvalidForm_Decision" targetRef="End_ValidationClosed" name="Closed after validation escalation" />
+    <bpmn:sequenceFlow id="F_NotifyInvalidTeam" sourceRef="Notify_InvalidTeam" targetRef="End_InvalidTeam" />
+    <bpmn:sequenceFlow id="F_TimerLate" sourceRef="Timer_SubmissionDeadline" targetRef="Late_Request" name="Late request" />
+    <bpmn:sequenceFlow id="F_LateDecision" sourceRef="Late_Request" targetRef="Late_Decision" />
+    <bpmn:sequenceFlow id="F_LateApproved" sourceRef="Late_Decision" targetRef="Resubmit_Proposal" name="Late submission approved">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= lateSubmissionApproved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_LateRejected" sourceRef="Late_Decision" targetRef="End_Lapsed" name="Late request rejected" />
+    <bpmn:sequenceFlow id="F_ScreenSimilarity" sourceRef="Screen_Proposal" targetRef="Check_Similarity" />
+    <bpmn:sequenceFlow id="F_SimilarityGateway" sourceRef="Check_Similarity" targetRef="Similarity_Decision" />
+    <bpmn:sequenceFlow id="F_SimilarityLow" sourceRef="Similarity_Decision" targetRef="Committee_Review" name="Below similarity threshold">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= similarityScore &lt; similarityThreshold</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_Similar" sourceRef="Similarity_Decision" targetRef="Review_Similarity" name="Above threshold" />
+    <bpmn:sequenceFlow id="F_ReviewSimilarityOutcome" sourceRef="Review_Similarity" targetRef="Similarity_Outcome" />
+    <bpmn:sequenceFlow id="F_SimClear" sourceRef="Similarity_Outcome" targetRef="Committee_Review" name="Reviewed as acceptable">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= similarityDisposition = "clear"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_SimModify" sourceRef="Similarity_Outcome" targetRef="Revise_Topic" name="Request topic modification">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= similarityDisposition = "modify"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_SimDuplicate" sourceRef="Similarity_Outcome" targetRef="End_Duplicate" name="Confirmed duplicate / reject" />
+    <bpmn:sequenceFlow id="F_ModifiedTopicCheck" sourceRef="Revise_Topic" targetRef="Check_Similarity" />
+    <bpmn:sequenceFlow id="F_CommitteeToDecision" sourceRef="Committee_Review" targetRef="Committee_Decision" />
+    <bpmn:sequenceFlow id="F_ReviewSLA" sourceRef="Timer_ReviewSLA" targetRef="Send_ReviewReminder" />
+    <bpmn:sequenceFlow id="F_SendReviewReminder" sourceRef="Send_ReviewReminder" targetRef="Wait_SecondSLA" />
+    <bpmn:sequenceFlow id="F_SecondReviewSLA" sourceRef="Wait_SecondSLA" targetRef="Escalate_Review" />
+    <bpmn:sequenceFlow id="F_EscalateReviewEnd" sourceRef="Escalate_Review" targetRef="End_ReviewEscalated" />
+    <bpmn:sequenceFlow id="F_CommitteeApprove" sourceRef="Committee_Decision" targetRef="Match_Guide" name="Approved">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= committeeDecision = "approve"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_CommitteeRevise" sourceRef="Committee_Decision" targetRef="Revision_Limit" name="Request revision">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= committeeDecision = "revise"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_CommitteeReject" sourceRef="Committee_Decision" targetRef="Rejected_Decision" name="Rejected" />
+    <bpmn:sequenceFlow id="F_RevisionAllowed" sourceRef="Revision_Limit" targetRef="Revise_Proposal" name="Revision cycles remain">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= revisionCycles &lt; 2</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_RevisionFinal" sourceRef="Revision_Limit" targetRef="Final_Committee_Vote" name="Maximum reached; final approve/reject" />
+    <bpmn:sequenceFlow id="F_RevisionTimer" sourceRef="Timer_RevisionSLA" targetRef="Notify_RevisionLapsed" />
+    <bpmn:sequenceFlow id="F_RevisionOverdue" sourceRef="Notify_RevisionLapsed" targetRef="End_RevisionLapsed" />
+    <bpmn:sequenceFlow id="F_RevisionToCount" sourceRef="Revise_Proposal" targetRef="Increment_Revision" />
+    <bpmn:sequenceFlow id="F_CountToCommittee" sourceRef="Increment_Revision" targetRef="Committee_Review" />
+    <bpmn:sequenceFlow id="F_FinalVoteDecision" sourceRef="Final_Committee_Vote" targetRef="Final_Decision" />
+    <bpmn:sequenceFlow id="F_FinalApproved" sourceRef="Final_Decision" targetRef="Match_Guide" name="Final approval">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= finalCommitteeDecision = "approve"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_FinalReject" sourceRef="Final_Decision" targetRef="Rejected_Decision" name="Final rejection" />
+    <bpmn:sequenceFlow id="F_OneNewTopic" sourceRef="Rejected_Decision" targetRef="Send_Rejection" name="First rejection; new topic still allowed">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= newTopicUsed = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_RejectedFinal" sourceRef="Rejected_Decision" targetRef="End_Rejected" name="New-topic allowance already used" />
+    <bpmn:sequenceFlow id="F_SendRejectionToTopic" sourceRef="Send_Rejection" targetRef="Submit_NewTopic" />
+    <bpmn:sequenceFlow id="F_NewTopicToMark" sourceRef="Submit_NewTopic" targetRef="Mark_NewTopic" />
+    <bpmn:sequenceFlow id="F_MarkNewTopicToValidate" sourceRef="Mark_NewTopic" targetRef="Validate_Proposal" />
+    <bpmn:sequenceFlow id="F_GuideMatchToAvailable" sourceRef="Match_Guide" targetRef="Guide_Available" />
+    <bpmn:sequenceFlow id="F_GuideFound" sourceRef="Guide_Available" targetRef="Allocate_Guide" name="Matching guide found">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= guideAvailable = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_NoGuide" sourceRef="Guide_Available" targetRef="Manual_GuidePlan" name="No matching guide" />
+    <bpmn:sequenceFlow id="F_ManualGuidePlan" sourceRef="Manual_GuidePlan" targetRef="Manual_Plan_Decision" />
+    <bpmn:sequenceFlow id="F_PlanWaitlist" sourceRef="Manual_Plan_Decision" targetRef="Guide_Waitlist_Timer" name="Waitlist">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= guideAllocationPlan = "waitlist"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_PlanManualAllocate" sourceRef="Manual_Plan_Decision" targetRef="Allocate_Guide" name="Manual/co-guide allocation" />
+    <bpmn:sequenceFlow id="F_WaitlistRematch" sourceRef="Guide_Waitlist_Timer" targetRef="Match_Guide" name="Review waitlist / rerun match" />
+    <bpmn:sequenceFlow id="F_AllocatedToSendRequest" sourceRef="Allocate_Guide" targetRef="Send_GuideRequest" />
+    <bpmn:sequenceFlow id="F_GuideRequestToWait" sourceRef="Send_GuideRequest" targetRef="Await_GuideResponse" />
+    <bpmn:sequenceFlow id="F_WaitAccepted" sourceRef="Await_GuideResponse" targetRef="Catch_GuideAccepted" />
+    <bpmn:sequenceFlow id="F_WaitDeclined" sourceRef="Await_GuideResponse" targetRef="Catch_GuideDeclined" />
+    <bpmn:sequenceFlow id="F_WaitTimeout" sourceRef="Await_GuideResponse" targetRef="Catch_GuideTimeout" />
+    <bpmn:sequenceFlow id="F_WaitWithdraw" sourceRef="Await_GuideResponse" targetRef="Catch_Withdrawal" />
+    <bpmn:sequenceFlow id="F_GuideDeclinedCount" sourceRef="Catch_GuideDeclined" targetRef="Exclude_DeclinedGuide" name="Declined" />
+    <bpmn:sequenceFlow id="F_GuideTimeoutCount" sourceRef="Catch_GuideTimeout" targetRef="Exclude_DeclinedGuide" name="No response" />
+    <bpmn:sequenceFlow id="F_ExcludeToLimit" sourceRef="Exclude_DeclinedGuide" targetRef="Guide_AttemptLimit" />
+    <bpmn:sequenceFlow id="F_Rematch" sourceRef="Guide_AttemptLimit" targetRef="Match_Guide" name="Attempts remain">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= guideAttempts &lt; 3</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_ManualGuide" sourceRef="Guide_AttemptLimit" targetRef="Manual_AfterDeclines" name="After 3 attempts" />
+    <bpmn:sequenceFlow id="F_ManualResolveDecision" sourceRef="Manual_AfterDeclines" targetRef="Manual_Guide_Decision" />
+    <bpmn:sequenceFlow id="F_ManualGuideAvailable" sourceRef="Manual_Guide_Decision" targetRef="Allocate_Guide" name="Coordinator finds another guide">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= manualGuideAvailable = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="F_NoGuideEnd" sourceRef="Manual_Guide_Decision" targetRef="End_NoGuide" name="No feasible guide / close" />
+    <bpmn:sequenceFlow id="F_GuideAcceptedNotify" sourceRef="Catch_GuideAccepted" targetRef="Notify_Student" name="Guide accepts" />
+    <bpmn:sequenceFlow id="F_NotifySuccess" sourceRef="Notify_Student" targetRef="End_Allocated" />
+    <bpmn:sequenceFlow id="F_NotifyError" sourceRef="Notify_Error" targetRef="Manual_Notify" name="Fallback after retries" />
+    <bpmn:sequenceFlow id="F_ManualNotifySuccess" sourceRef="Manual_Notify" targetRef="End_Allocated" />
+    <bpmn:sequenceFlow id="F_WithdrawalCompensate" sourceRef="Catch_Withdrawal" targetRef="Compensate_Withdrawal" name="Team withdraws after approval" />
+    <bpmn:sequenceFlow id="F_WithdrawalNotify" sourceRef="Compensate_Withdrawal" targetRef="Notify_Withdrawal" />
+    <bpmn:sequenceFlow id="F_WithdrawalEnd" sourceRef="Notify_Withdrawal" targetRef="End_Withdrawn" />
+    <bpmn:association id="Association_Allocate_Release" sourceRef="Compensation_Allocate" targetRef="Release_GuideSlot" associationDirection="One" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagram_StudentProjectApproval">
+    <bpmndi:BPMNPlane id="Plane_StudentProjectApproval" bpmnElement="Collaboration_StudentProjectApproval">
+      <bpmndi:BPMNShape id="Participant_Main_di" bpmnElement="Participant_Main" isHorizontal="true">
+        <dc:Bounds x="80" y="40" width="5000" height="1220" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Student_di" bpmnElement="Lane_Student" isHorizontal="true">
+        <dc:Bounds x="110" y="80" width="4970" height="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="112" y="84" width="105" height="212" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Coordinator_di" bpmnElement="Lane_Coordinator" isHorizontal="true">
+        <dc:Bounds x="110" y="300" width="4970" height="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="112" y="304" width="105" height="212" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Committee_di" bpmnElement="Lane_Committee" isHorizontal="true">
+        <dc:Bounds x="110" y="520" width="4970" height="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="112" y="524" width="105" height="212" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_Guide_di" bpmnElement="Lane_Guide" isHorizontal="true">
+        <dc:Bounds x="110" y="740" width="4970" height="220" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="112" y="744" width="105" height="212" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_System_di" bpmnElement="Lane_System" isHorizontal="true">
+        <dc:Bounds x="110" y="960" width="4970" height="300" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="112" y="964" width="105" height="292" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_Submit_di" bpmnElement="Start_Submit">
+        <dc:Bounds x="185" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Submit_Proposal_di" bpmnElement="Submit_Proposal">
+        <dc:Bounds x="270" y="150" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Timer_SubmissionDeadline_di" bpmnElement="Timer_SubmissionDeadline">
+        <dc:Bounds x="345" y="205" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Late_Request_di" bpmnElement="Late_Request">
+        <dc:Bounds x="410" y="365" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Late_Decision_di" bpmnElement="Late_Decision" isMarkerVisible="true">
+        <dc:Bounds x="555" y="380" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Validate_Proposal_di" bpmnElement="Validate_Proposal">
+        <dc:Bounds x="430" y="1030" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Validation_Decision_di" bpmnElement="Validation_Decision" isMarkerVisible="true">
+        <dc:Bounds x="585" y="1045" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Send_ValidationErrors_di" bpmnElement="Send_ValidationErrors">
+        <dc:Bounds x="730" y="1070" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Resubmit_Proposal_di" bpmnElement="Resubmit_Proposal">
+        <dc:Bounds x="730" y="125" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Escalate_InvalidForm_di" bpmnElement="Escalate_InvalidForm">
+        <dc:Bounds x="900" y="365" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="InvalidForm_Decision_di" bpmnElement="InvalidForm_Decision" isMarkerVisible="true">
+        <dc:Bounds x="1060" y="380" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_ValidationClosed_di" bpmnElement="End_ValidationClosed">
+        <dc:Bounds x="1150" y="1088" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_InvalidTeam_di" bpmnElement="End_InvalidTeam">
+        <dc:Bounds x="760" y="205" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Notify_InvalidTeam_di" bpmnElement="Notify_InvalidTeam">
+        <dc:Bounds x="760" y="1160" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Screen_Proposal_di" bpmnElement="Screen_Proposal">
+        <dc:Bounds x="1200" y="365" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Check_Similarity_di" bpmnElement="Check_Similarity">
+        <dc:Bounds x="1200" y="1030" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Similarity_Decision_di" bpmnElement="Similarity_Decision" isMarkerVisible="true">
+        <dc:Bounds x="1370" y="1045" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Review_Similarity_di" bpmnElement="Review_Similarity">
+        <dc:Bounds x="1430" y="365" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Similarity_Outcome_di" bpmnElement="Similarity_Outcome" isMarkerVisible="true">
+        <dc:Bounds x="1600" y="380" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Revise_Topic_di" bpmnElement="Revise_Topic">
+        <dc:Bounds x="1610" y="125" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Duplicate_di" bpmnElement="End_Duplicate">
+        <dc:Bounds x="1770" y="165" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Committee_Review_di" bpmnElement="Committee_Review">
+        <dc:Bounds x="1630" y="575" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Timer_ReviewSLA_di" bpmnElement="Timer_ReviewSLA">
+        <dc:Bounds x="1715" y="640" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Send_ReviewReminder_di" bpmnElement="Send_ReviewReminder">
+        <dc:Bounds x="1800" y="1070" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Wait_SecondSLA_di" bpmnElement="Wait_SecondSLA">
+        <dc:Bounds x="1970" y="1088" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Escalate_Review_di" bpmnElement="Escalate_Review">
+        <dc:Bounds x="1940" y="660" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_ReviewEscalated_di" bpmnElement="End_ReviewEscalated">
+        <dc:Bounds x="2160" y="1088" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Committee_Decision_di" bpmnElement="Committee_Decision" isMarkerVisible="true">
+        <dc:Bounds x="1800" y="595" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Revision_Limit_di" bpmnElement="Revision_Limit" isMarkerVisible="true">
+        <dc:Bounds x="1960" y="595" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Revise_Proposal_di" bpmnElement="Revise_Proposal">
+        <dc:Bounds x="1990" y="125" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Timer_RevisionSLA_di" bpmnElement="Timer_RevisionSLA">
+        <dc:Bounds x="2070" y="205" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Notify_RevisionLapsed_di" bpmnElement="Notify_RevisionLapsed">
+        <dc:Bounds x="2220" y="1070" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_RevisionLapsed_di" bpmnElement="End_RevisionLapsed">
+        <dc:Bounds x="2380" y="1080" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Increment_Revision_di" bpmnElement="Increment_Revision">
+        <dc:Bounds x="2240" y="990" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Final_Committee_Vote_di" bpmnElement="Final_Committee_Vote">
+        <dc:Bounds x="2120" y="620" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Final_Decision_di" bpmnElement="Final_Decision" isMarkerVisible="true">
+        <dc:Bounds x="2280" y="595" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Rejected_Decision_di" bpmnElement="Rejected_Decision" isMarkerVisible="true">
+        <dc:Bounds x="2450" y="595" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Send_Rejection_di" bpmnElement="Send_Rejection">
+        <dc:Bounds x="2540" y="1070" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Submit_NewTopic_di" bpmnElement="Submit_NewTopic">
+        <dc:Bounds x="2540" y="125" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Mark_NewTopic_di" bpmnElement="Mark_NewTopic">
+        <dc:Bounds x="2700" y="1030" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Rejected_di" bpmnElement="End_Rejected">
+        <dc:Bounds x="2780" y="165" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Match_Guide_di" bpmnElement="Match_Guide">
+        <dc:Bounds x="2850" y="1030" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Guide_Available_di" bpmnElement="Guide_Available" isMarkerVisible="true">
+        <dc:Bounds x="3030" y="1045" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Manual_GuidePlan_di" bpmnElement="Manual_GuidePlan">
+        <dc:Bounds x="3050" y="365" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Manual_Plan_Decision_di" bpmnElement="Manual_Plan_Decision" isMarkerVisible="true">
+        <dc:Bounds x="3240" y="380" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Guide_Waitlist_Timer_di" bpmnElement="Guide_Waitlist_Timer">
+        <dc:Bounds x="3280" y="1088" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Allocate_Guide_di" bpmnElement="Allocate_Guide">
+        <dc:Bounds x="3420" y="1030" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Compensation_Allocate_di" bpmnElement="Compensation_Allocate">
+        <dc:Bounds x="3500" y="1130" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Release_GuideSlot_di" bpmnElement="Release_GuideSlot">
+        <dc:Bounds x="3640" y="1125" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Send_GuideRequest_di" bpmnElement="Send_GuideRequest">
+        <dc:Bounds x="3590" y="1030" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Await_GuideResponse_di" bpmnElement="Await_GuideResponse" isMarkerVisible="true">
+        <dc:Bounds x="3770" y="1045" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_GuideAccepted_di" bpmnElement="Catch_GuideAccepted">
+        <dc:Bounds x="3860" y="775" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_GuideDeclined_di" bpmnElement="Catch_GuideDeclined">
+        <dc:Bounds x="4000" y="775" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_GuideTimeout_di" bpmnElement="Catch_GuideTimeout">
+        <dc:Bounds x="4140" y="775" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Catch_Withdrawal_di" bpmnElement="Catch_Withdrawal">
+        <dc:Bounds x="4280" y="775" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Exclude_DeclinedGuide_di" bpmnElement="Exclude_DeclinedGuide">
+        <dc:Bounds x="3920" y="1030" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Guide_AttemptLimit_di" bpmnElement="Guide_AttemptLimit" isMarkerVisible="true">
+        <dc:Bounds x="4090" y="1045" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Manual_AfterDeclines_di" bpmnElement="Manual_AfterDeclines">
+        <dc:Bounds x="4150" y="365" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Manual_Guide_Decision_di" bpmnElement="Manual_Guide_Decision" isMarkerVisible="true">
+        <dc:Bounds x="4340" y="380" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_NoGuide_di" bpmnElement="End_NoGuide">
+        <dc:Bounds x="4530" y="1080" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Notify_Student_di" bpmnElement="Notify_Student">
+        <dc:Bounds x="3940" y="1120" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Notify_Error_di" bpmnElement="Notify_Error">
+        <dc:Bounds x="4025" y="1198" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Manual_Notify_di" bpmnElement="Manual_Notify">
+        <dc:Bounds x="4470" y="425" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Allocated_di" bpmnElement="End_Allocated">
+        <dc:Bounds x="4140" y="1132" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Compensate_Withdrawal_di" bpmnElement="Compensate_Withdrawal">
+        <dc:Bounds x="4450" y="1088" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Notify_Withdrawal_di" bpmnElement="Notify_Withdrawal">
+        <dc:Bounds x="4610" y="1030" width="110" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Withdrawn_di" bpmnElement="End_Withdrawn">
+        <dc:Bounds x="4780" y="1080" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="End_Lapsed_di" bpmnElement="End_Lapsed">
+        <dc:Bounds x="920" y="220" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="F_StartSubmit_di" bpmnElement="F_StartSubmit">
+        <di:waypoint x="221" y="190" />
+        <di:waypoint x="270" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_SubmitValidate_di" bpmnElement="F_SubmitValidate">
+        <di:waypoint x="380" y="190" />
+        <di:waypoint x="380" y="1070" />
+        <di:waypoint x="430" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ValidateGateway_di" bpmnElement="F_ValidateGateway">
+        <di:waypoint x="540" y="1070" />
+        <di:waypoint x="585" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_InvalidForm_di" bpmnElement="F_InvalidForm">
+        <di:waypoint x="635" y="1070" />
+        <di:waypoint x="730" y="1070" />
+        <di:waypoint x="730" y="1110" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="612" y="1040" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_TooManyFormErrors_di" bpmnElement="F_TooManyFormErrors">
+        <di:waypoint x="635" y="1070" />
+        <di:waypoint x="635" y="405" />
+        <di:waypoint x="900" y="405" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="698" y="687" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_InvalidTeam_di" bpmnElement="F_InvalidTeam">
+        <di:waypoint x="635" y="1070" />
+        <di:waypoint x="635" y="1200" />
+        <di:waypoint x="760" y="1200" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="628" y="1084" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Valid_di" bpmnElement="F_Valid">
+        <di:waypoint x="610" y="1045" />
+        <di:waypoint x="610" y="646" />
+        <di:waypoint x="1255" y="646" />
+        <di:waypoint x="1255" y="445" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="848" y="687" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ValidationFeedback_di" bpmnElement="F_ValidationFeedback">
+        <di:waypoint x="730" y="1110" />
+        <di:waypoint x="840" y="1110" />
+        <di:waypoint x="840" y="165" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ResubmitValidate_di" bpmnElement="F_ResubmitValidate">
+        <di:waypoint x="730" y="165" />
+        <di:waypoint x="540" y="165" />
+        <di:waypoint x="540" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_CoordFormGateway_di" bpmnElement="F_CoordFormGateway">
+        <di:waypoint x="1010" y="405" />
+        <di:waypoint x="1060" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_FormResolved_di" bpmnElement="F_FormResolved">
+        <di:waypoint x="1110" y="405" />
+        <di:waypoint x="1200" y="405" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1085" y="354" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_FormClosed_di" bpmnElement="F_FormClosed">
+        <di:waypoint x="1110" y="405" />
+        <di:waypoint x="1150" y="405" />
+        <di:waypoint x="1150" y="1106" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1060" y="716" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_NotifyInvalidTeam_di" bpmnElement="F_NotifyInvalidTeam">
+        <di:waypoint x="870" y="1200" />
+        <di:waypoint x="870" y="223" />
+        <di:waypoint x="760" y="223" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_TimerLate_di" bpmnElement="F_TimerLate">
+        <di:waypoint x="363" y="241" />
+        <di:waypoint x="465" y="241" />
+        <di:waypoint x="465" y="365" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="332" y="267" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_LateDecision_di" bpmnElement="F_LateDecision">
+        <di:waypoint x="520" y="405" />
+        <di:waypoint x="555" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_LateApproved_di" bpmnElement="F_LateApproved">
+        <di:waypoint x="605" y="405" />
+        <di:waypoint x="730" y="405" />
+        <di:waypoint x="730" y="165" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="598" y="234" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_LateRejected_di" bpmnElement="F_LateRejected">
+        <di:waypoint x="580" y="380" />
+        <di:waypoint x="580" y="256" />
+        <di:waypoint x="938" y="256" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="692" y="282" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ScreenSimilarity_di" bpmnElement="F_ScreenSimilarity">
+        <di:waypoint x="1255" y="445" />
+        <di:waypoint x="1255" y="1030" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_SimilarityGateway_di" bpmnElement="F_SimilarityGateway">
+        <di:waypoint x="1310" y="1070" />
+        <di:waypoint x="1370" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_SimilarityLow_di" bpmnElement="F_SimilarityLow">
+        <di:waypoint x="1420" y="1070" />
+        <di:waypoint x="1630" y="1070" />
+        <di:waypoint x="1630" y="615" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1455" y="792" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Similar_di" bpmnElement="F_Similar">
+        <di:waypoint x="1420" y="1070" />
+        <di:waypoint x="1430" y="1070" />
+        <di:waypoint x="1430" y="405" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1355" y="687" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ReviewSimilarityOutcome_di" bpmnElement="F_ReviewSimilarityOutcome">
+        <di:waypoint x="1540" y="405" />
+        <di:waypoint x="1600" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_SimClear_di" bpmnElement="F_SimClear">
+        <di:waypoint x="1625" y="430" />
+        <di:waypoint x="1685" y="430" />
+        <di:waypoint x="1685" y="575" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1570" y="460" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_SimModify_di" bpmnElement="F_SimModify">
+        <di:waypoint x="1625" y="380" />
+        <di:waypoint x="1665" y="380" />
+        <di:waypoint x="1665" y="205" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1560" y="234" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_SimDuplicate_di" bpmnElement="F_SimDuplicate">
+        <di:waypoint x="1650" y="405" />
+        <di:waypoint x="1770" y="405" />
+        <di:waypoint x="1770" y="183" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1640" y="254" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ModifiedTopicCheck_di" bpmnElement="F_ModifiedTopicCheck">
+        <di:waypoint x="1610" y="165" />
+        <di:waypoint x="1324" y="165" />
+        <di:waypoint x="1324" y="1070" />
+        <di:waypoint x="1310" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_CommitteeToDecision_di" bpmnElement="F_CommitteeToDecision">
+        <di:waypoint x="1740" y="615" />
+        <di:waypoint x="1800" y="615" />
+        <di:waypoint x="1800" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ReviewSLA_di" bpmnElement="F_ReviewSLA">
+        <di:waypoint x="1751" y="658" />
+        <di:waypoint x="1800" y="658" />
+        <di:waypoint x="1800" y="1110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_SendReviewReminder_di" bpmnElement="F_SendReviewReminder">
+        <di:waypoint x="1910" y="1110" />
+        <di:waypoint x="1970" y="1110" />
+        <di:waypoint x="1970" y="1106" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_SecondReviewSLA_di" bpmnElement="F_SecondReviewSLA">
+        <di:waypoint x="1988" y="1088" />
+        <di:waypoint x="1995" y="1088" />
+        <di:waypoint x="1995" y="740" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_EscalateReviewEnd_di" bpmnElement="F_EscalateReviewEnd">
+        <di:waypoint x="2050" y="700" />
+        <di:waypoint x="2050" y="1106" />
+        <di:waypoint x="2160" y="1106" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_CommitteeApprove_di" bpmnElement="F_CommitteeApprove">
+        <di:waypoint x="1825" y="645" />
+        <di:waypoint x="1825" y="825" />
+        <di:waypoint x="2905" y="825" />
+        <di:waypoint x="2905" y="1030" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2280" y="794" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_CommitteeRevise_di" bpmnElement="F_CommitteeRevise">
+        <di:waypoint x="1850" y="620" />
+        <di:waypoint x="1960" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1835" y="577" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_CommitteeReject_di" bpmnElement="F_CommitteeReject">
+        <di:waypoint x="1825" y="645" />
+        <di:waypoint x="1825" y="581" />
+        <di:waypoint x="2475" y="581" />
+        <di:waypoint x="2475" y="595" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2080" y="577" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_RevisionAllowed_di" bpmnElement="F_RevisionAllowed">
+        <di:waypoint x="1985" y="595" />
+        <di:waypoint x="2045" y="595" />
+        <di:waypoint x="2045" y="205" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1930" y="342" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_RevisionFinal_di" bpmnElement="F_RevisionFinal">
+        <di:waypoint x="2010" y="620" />
+        <di:waypoint x="2120" y="620" />
+        <di:waypoint x="2120" y="660" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1995" y="590" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_RevisionTimer_di" bpmnElement="F_RevisionTimer">
+        <di:waypoint x="2106" y="223" />
+        <di:waypoint x="2220" y="223" />
+        <di:waypoint x="2220" y="1110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_RevisionOverdue_di" bpmnElement="F_RevisionOverdue">
+        <di:waypoint x="2330" y="1110" />
+        <di:waypoint x="2380" y="1110" />
+        <di:waypoint x="2380" y="1098" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_RevisionToCount_di" bpmnElement="F_RevisionToCount">
+        <di:waypoint x="2100" y="165" />
+        <di:waypoint x="2240" y="165" />
+        <di:waypoint x="2240" y="1030" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_CountToCommittee_di" bpmnElement="F_CountToCommittee">
+        <di:waypoint x="2240" y="1030" />
+        <di:waypoint x="1740" y="1030" />
+        <di:waypoint x="1740" y="615" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_FinalVoteDecision_di" bpmnElement="F_FinalVoteDecision">
+        <di:waypoint x="2230" y="660" />
+        <di:waypoint x="2280" y="660" />
+        <di:waypoint x="2280" y="620" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_FinalApproved_di" bpmnElement="F_FinalApproved">
+        <di:waypoint x="2305" y="645" />
+        <di:waypoint x="2305" y="659" />
+        <di:waypoint x="2905" y="659" />
+        <di:waypoint x="2905" y="1030" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2520" y="794" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_FinalReject_di" bpmnElement="F_FinalReject">
+        <di:waypoint x="2330" y="620" />
+        <di:waypoint x="2450" y="620" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2320" y="577" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_OneNewTopic_di" bpmnElement="F_OneNewTopic">
+        <di:waypoint x="2500" y="620" />
+        <di:waypoint x="2540" y="620" />
+        <di:waypoint x="2540" y="1110" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2450" y="814" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_RejectedFinal_di" bpmnElement="F_RejectedFinal">
+        <di:waypoint x="2500" y="620" />
+        <di:waypoint x="2780" y="620" />
+        <di:waypoint x="2780" y="183" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2570" y="362" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_SendRejectionToTopic_di" bpmnElement="F_SendRejectionToTopic">
+        <di:waypoint x="2595" y="1070" />
+        <di:waypoint x="2595" y="205" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_NewTopicToMark_di" bpmnElement="F_NewTopicToMark">
+        <di:waypoint x="2650" y="165" />
+        <di:waypoint x="2700" y="165" />
+        <di:waypoint x="2700" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_MarkNewTopicToValidate_di" bpmnElement="F_MarkNewTopicToValidate">
+        <di:waypoint x="2755" y="1110" />
+        <di:waypoint x="2755" y="1016" />
+        <di:waypoint x="485" y="1016" />
+        <di:waypoint x="485" y="1030" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_GuideMatchToAvailable_di" bpmnElement="F_GuideMatchToAvailable">
+        <di:waypoint x="2960" y="1070" />
+        <di:waypoint x="3030" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_GuideFound_di" bpmnElement="F_GuideFound">
+        <di:waypoint x="3080" y="1070" />
+        <di:waypoint x="3420" y="1070" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3180" y="1020" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_NoGuide_di" bpmnElement="F_NoGuide">
+        <di:waypoint x="3055" y="1045" />
+        <di:waypoint x="3105" y="1045" />
+        <di:waypoint x="3105" y="445" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2995" y="687" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ManualGuidePlan_di" bpmnElement="F_ManualGuidePlan">
+        <di:waypoint x="3160" y="405" />
+        <di:waypoint x="3240" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_PlanWaitlist_di" bpmnElement="F_PlanWaitlist">
+        <di:waypoint x="3265" y="430" />
+        <di:waypoint x="3298" y="430" />
+        <di:waypoint x="3298" y="1088" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3215" y="716" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_PlanManualAllocate_di" bpmnElement="F_PlanManualAllocate">
+        <di:waypoint x="3290" y="405" />
+        <di:waypoint x="3420" y="405" />
+        <di:waypoint x="3420" y="1070" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3285" y="687" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_WaitlistRematch_di" bpmnElement="F_WaitlistRematch">
+        <di:waypoint x="3280" y="1106" />
+        <di:waypoint x="2960" y="1106" />
+        <di:waypoint x="2960" y="1070" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3020" y="1041" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_AllocatedToSendRequest_di" bpmnElement="F_AllocatedToSendRequest">
+        <di:waypoint x="3530" y="1070" />
+        <di:waypoint x="3590" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_GuideRequestToWait_di" bpmnElement="F_GuideRequestToWait">
+        <di:waypoint x="3700" y="1070" />
+        <di:waypoint x="3770" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_WaitAccepted_di" bpmnElement="F_WaitAccepted">
+        <di:waypoint x="3820" y="1070" />
+        <di:waypoint x="3860" y="1070" />
+        <di:waypoint x="3860" y="793" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_WaitDeclined_di" bpmnElement="F_WaitDeclined">
+        <di:waypoint x="3820" y="1070" />
+        <di:waypoint x="3906" y="1070" />
+        <di:waypoint x="3906" y="793" />
+        <di:waypoint x="4000" y="793" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_WaitTimeout_di" bpmnElement="F_WaitTimeout">
+        <di:waypoint x="3795" y="1045" />
+        <di:waypoint x="3795" y="825" />
+        <di:waypoint x="4158" y="825" />
+        <di:waypoint x="4158" y="811" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_WaitWithdraw_di" bpmnElement="F_WaitWithdraw">
+        <di:waypoint x="3795" y="1045" />
+        <di:waypoint x="3795" y="825" />
+        <di:waypoint x="4298" y="825" />
+        <di:waypoint x="4298" y="811" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_GuideDeclinedCount_di" bpmnElement="F_GuideDeclinedCount">
+        <di:waypoint x="4018" y="811" />
+        <di:waypoint x="3975" y="811" />
+        <di:waypoint x="3975" y="1030" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3915" y="884" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_GuideTimeoutCount_di" bpmnElement="F_GuideTimeoutCount">
+        <di:waypoint x="4158" y="811" />
+        <di:waypoint x="4158" y="1030" />
+        <di:waypoint x="3975" y="1030" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3985" y="884" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ExcludeToLimit_di" bpmnElement="F_ExcludeToLimit">
+        <di:waypoint x="4030" y="1070" />
+        <di:waypoint x="4090" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_Rematch_di" bpmnElement="F_Rematch">
+        <di:waypoint x="4115" y="1095" />
+        <di:waypoint x="4115" y="1016" />
+        <di:waypoint x="2905" y="1016" />
+        <di:waypoint x="2905" y="1030" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3425" y="1020" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ManualGuide_di" bpmnElement="F_ManualGuide">
+        <di:waypoint x="4115" y="1045" />
+        <di:waypoint x="4205" y="1045" />
+        <di:waypoint x="4205" y="445" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4075" y="687" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ManualResolveDecision_di" bpmnElement="F_ManualResolveDecision">
+        <di:waypoint x="4260" y="405" />
+        <di:waypoint x="4340" y="405" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ManualGuideAvailable_di" bpmnElement="F_ManualGuideAvailable">
+        <di:waypoint x="4365" y="430" />
+        <di:waypoint x="4365" y="646" />
+        <di:waypoint x="3475" y="646" />
+        <di:waypoint x="3475" y="1030" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3835" y="687" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_NoGuideEnd_di" bpmnElement="F_NoGuideEnd">
+        <di:waypoint x="4365" y="430" />
+        <di:waypoint x="4365" y="1080" />
+        <di:waypoint x="4548" y="1080" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4390" y="712" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_GuideAcceptedNotify_di" bpmnElement="F_GuideAcceptedNotify">
+        <di:waypoint x="3896" y="793" />
+        <di:waypoint x="3896" y="1160" />
+        <di:waypoint x="3940" y="1160" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3855" y="930" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_NotifySuccess_di" bpmnElement="F_NotifySuccess">
+        <di:waypoint x="4050" y="1160" />
+        <di:waypoint x="4140" y="1160" />
+        <di:waypoint x="4140" y="1150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_NotifyError_di" bpmnElement="F_NotifyError">
+        <di:waypoint x="4061" y="1216" />
+        <di:waypoint x="4061" y="465" />
+        <di:waypoint x="4470" y="465" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4202" y="794" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_ManualNotifySuccess_di" bpmnElement="F_ManualNotifySuccess">
+        <di:waypoint x="4470" y="465" />
+        <di:waypoint x="4190" y="465" />
+        <di:waypoint x="4190" y="1150" />
+        <di:waypoint x="4176" y="1150" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_WithdrawalCompensate_di" bpmnElement="F_WithdrawalCompensate">
+        <di:waypoint x="4316" y="793" />
+        <di:waypoint x="4450" y="793" />
+        <di:waypoint x="4450" y="1106" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4320" y="914" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_WithdrawalNotify_di" bpmnElement="F_WithdrawalNotify">
+        <di:waypoint x="4486" y="1106" />
+        <di:waypoint x="4486" y="1070" />
+        <di:waypoint x="4610" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="F_WithdrawalEnd_di" bpmnElement="F_WithdrawalEnd">
+        <di:waypoint x="4720" y="1070" />
+        <di:waypoint x="4780" y="1070" />
+        <di:waypoint x="4780" y="1098" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Association_Allocate_Release_di" bpmnElement="Association_Allocate_Release">
+        <di:waypoint x="3536" y="1148" />
+        <di:waypoint x="3640" y="1148" />
+        <di:waypoint x="3640" y="1165" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
