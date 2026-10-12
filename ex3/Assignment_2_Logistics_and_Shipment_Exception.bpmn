@@ -1,0 +1,1809 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:ns1="http://camunda.org/schema/modeler/1.0" id="A2_Definitions" targetNamespace="https://example.org/bpmn/assignments" exporter="Camunda Modeler" exporterVersion="5.49.0" ns1:executionPlatform="Camunda Cloud" ns1:executionPlatformVersion="8.8.0">
+  <bpmn:process id="A2_Shipment_Process" name="Logistics and Shipment Exception Management" isExecutable="false">
+    <bpmn:laneSet id="A2_Lanes">
+      <bpmn:lane id="A2_MainLane" name="Shipment operations">
+        <bpmn:flowNodeRef>A2_Shipment_Process_s</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_split</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_join</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_close</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_done</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_charge</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_booking</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_pickup</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_transit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_delivery</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_bookingerr</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_returntransit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_pickerr</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_returndelivery</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_cancel</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_lostcatch</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_chargecomp</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="A2_SupportLane" name="Support / claims">
+        <bpmn:flowNodeRef>A2_Shipment_Process_compensate</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_lost</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_refundthrow</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_bookingclosed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_cancelend</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_returned</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_tracking</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_trackmanual</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_cancelnotice</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_return</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_refund</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A2_Shipment_Process_trackerr</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="A2_Shipment_Process_s" name="Booking started">
+      <bpmn:outgoing>A2_Shipment_Process_Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="A2_Shipment_Process_compensate" name="Record loss and pay compensation">
+      <bpmn:incoming>A2_Shipment_Process_Flow_18</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_17</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="A2_Shipment_Process_lost" name="Parcel lost">
+      <bpmn:incoming>A2_Shipment_Process_Flow_17</bpmn:incoming>
+      <bpmn:terminateEventDefinition />
+    </bpmn:endEvent>
+    <bpmn:intermediateThrowEvent id="A2_Shipment_Process_refundthrow" name="Compensate shipment charge">
+      <bpmn:incoming>A2_Shipment_Process_Flow_21</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_22</bpmn:outgoing>
+      <bpmn:compensateEventDefinition activityRef="A2_Shipment_Process_charge" />
+    </bpmn:intermediateThrowEvent>
+    <bpmn:endEvent id="A2_Shipment_Process_bookingclosed" name="Closed: invalid booking">
+      <bpmn:incoming>A2_Shipment_Process_bookingerrflow</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="A2_Shipment_Process_cancelend" name="Booking cancelled">
+      <bpmn:incoming>A2_Shipment_Process_Flow_13</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:endEvent id="A2_Shipment_Process_returned" name="Returned to sender">
+      <bpmn:incoming>A2_Shipment_Process_Flow_16</bpmn:incoming>
+      <bpmn:terminateEventDefinition />
+    </bpmn:endEvent>
+    <bpmn:subProcess id="A2_booking" name="Book shipment">
+      <bpmn:incoming>A2_Shipment_Process_Flow_1</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_2</bpmn:outgoing>
+      <bpmn:startEvent id="A2_booking_b0" name="Start">
+        <bpmn:outgoing>A2_booking_Flow_1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:userTask id="A2_booking_book" name="Shipper enters or corrects booking">
+        <bpmn:incoming>A2_booking_Flow_1</bpmn:incoming>
+        <bpmn:incoming>A2_booking_retry_yes</bpmn:incoming>
+        <bpmn:outgoing>A2_booking_Flow_2</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:businessRuleTask id="A2_booking_price" name="Validate address weight and service; calculate charge">
+        <bpmn:incoming>A2_booking_Flow_2</bpmn:incoming>
+        <bpmn:outgoing>A2_booking_Flow_3</bpmn:outgoing>
+      </bpmn:businessRuleTask>
+      <bpmn:exclusiveGateway id="A2_booking_valid" name="Booking valid?">
+        <bpmn:incoming>A2_booking_Flow_3</bpmn:incoming>
+        <bpmn:outgoing>A2_booking_Flow_4</bpmn:outgoing>
+        <bpmn:outgoing>A2_booking_Flow_5</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="A2_booking_schedule" name="Schedule pickup and assign driver">
+        <bpmn:incoming>A2_booking_Flow_4</bpmn:incoming>
+        <bpmn:outgoing>A2_booking_Flow_6</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:endEvent id="A2_booking_bdone" name="Ready for pickup">
+        <bpmn:incoming>A2_booking_Flow_6</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="A2_booking_Flow_1" sourceRef="A2_booking_b0" targetRef="A2_booking_book" />
+      <bpmn:sequenceFlow id="A2_booking_Flow_2" sourceRef="A2_booking_book" targetRef="A2_booking_price" />
+      <bpmn:sequenceFlow id="A2_booking_Flow_3" sourceRef="A2_booking_price" targetRef="A2_booking_valid" />
+      <bpmn:sequenceFlow id="A2_booking_Flow_4" name="Yes" sourceRef="A2_booking_valid" targetRef="A2_booking_schedule" />
+      <bpmn:sequenceFlow id="A2_booking_Flow_5" name="Invalid details" sourceRef="A2_booking_valid" targetRef="A2_booking_retry" />
+      <bpmn:sequenceFlow id="A2_booking_Flow_6" sourceRef="A2_booking_schedule" targetRef="A2_booking_bdone" />
+      <bpmn:exclusiveGateway id="A2_booking_retry" name="Corrections remaining?">
+        <bpmn:incoming>A2_booking_Flow_5</bpmn:incoming>
+        <bpmn:outgoing>A2_booking_retry_yes</bpmn:outgoing>
+        <bpmn:outgoing>A2_booking_retry_no</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:endEvent id="A2_booking_invalid" name="Invalid after correction limit">
+        <bpmn:incoming>A2_booking_retry_no</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="A2_error_INVALID_BOOKING" />
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="A2_booking_retry_yes" name="Correction allowed" sourceRef="A2_booking_retry" targetRef="A2_booking_book" />
+      <bpmn:sequenceFlow id="A2_booking_retry_no" name="Limit reached" sourceRef="A2_booking_retry" targetRef="A2_booking_invalid" />
+    </bpmn:subProcess>
+    <bpmn:subProcess id="A2_pickup" name="Collect parcel">
+      <bpmn:incoming>A2_Shipment_Process_Flow_2</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_19</bpmn:outgoing>
+      <bpmn:startEvent id="A2_pickup_p0" name="Start">
+        <bpmn:outgoing>A2_pickup_Flow_1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:userTask id="A2_pickup_collect" name="Collect parcel and record pickup result">
+        <bpmn:documentation>Record whether collection succeeded and increment the failed-pickup count after an unsuccessful attempt.</bpmn:documentation>
+        <bpmn:incoming>A2_pickup_Flow_1</bpmn:incoming>
+        <bpmn:incoming>A2_pickup_Flow_7</bpmn:incoming>
+        <bpmn:outgoing>A2_pickup_Flow_2</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A2_pickup_pg" name="Pickup result">
+        <bpmn:incoming>A2_pickup_Flow_2</bpmn:incoming>
+        <bpmn:outgoing>A2_pickup_Flow_3</bpmn:outgoing>
+        <bpmn:outgoing>A2_pickup_Flow_4</bpmn:outgoing>
+        <bpmn:outgoing>A2_pickup_Flow_5</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:userTask id="A2_pickup_packing" name="Check packaging and pickup scan">
+        <bpmn:documentation>Record the scan and whether repacking has already been attempted; only one repacking opportunity is allowed.</bpmn:documentation>
+        <bpmn:incoming>A2_pickup_Flow_3</bpmn:incoming>
+        <bpmn:incoming>A2_pickup_Flow_11</bpmn:incoming>
+        <bpmn:outgoing>A2_pickup_Flow_8</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A2_pickup_safe" name="Packaging safe?">
+        <bpmn:incoming>A2_pickup_Flow_8</bpmn:incoming>
+        <bpmn:outgoing>A2_pickup_Flow_9</bpmn:outgoing>
+        <bpmn:outgoing>A2_pickup_Flow_10</bpmn:outgoing>
+        <bpmn:outgoing>A2_pickup_Flow_12</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:endEvent id="A2_pickup_pdone" name="Parcel collected">
+        <bpmn:incoming>A2_pickup_Flow_9</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:userTask id="A2_pickup_reschedule" name="Reschedule pickup">
+        <bpmn:incoming>A2_pickup_Flow_4</bpmn:incoming>
+        <bpmn:outgoing>A2_pickup_Flow_6</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:intermediateCatchEvent id="A2_pickup_wait" name="Wait until next day">
+        <bpmn:incoming>A2_pickup_Flow_6</bpmn:incoming>
+        <bpmn:outgoing>A2_pickup_Flow_7</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P1D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:userTask id="A2_pickup_repack" name="Shipper repacks once">
+        <bpmn:incoming>A2_pickup_Flow_10</bpmn:incoming>
+        <bpmn:outgoing>A2_pickup_Flow_11</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:endEvent id="A2_pickup_cancelled" name="Cancel pickup">
+        <bpmn:incoming>A2_pickup_Flow_5</bpmn:incoming>
+        <bpmn:incoming>A2_pickup_Flow_12</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="A2_error_CANCEL" />
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="A2_pickup_Flow_1" sourceRef="A2_pickup_p0" targetRef="A2_pickup_collect" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_2" sourceRef="A2_pickup_collect" targetRef="A2_pickup_pg" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_3" name="Collected" sourceRef="A2_pickup_pg" targetRef="A2_pickup_packing" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_4" name="First failure" sourceRef="A2_pickup_pg" targetRef="A2_pickup_reschedule" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_5" name="Second failure" sourceRef="A2_pickup_pg" targetRef="A2_pickup_cancelled" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_6" sourceRef="A2_pickup_reschedule" targetRef="A2_pickup_wait" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_7" sourceRef="A2_pickup_wait" targetRef="A2_pickup_collect" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_8" sourceRef="A2_pickup_packing" targetRef="A2_pickup_safe" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_9" name="Safe" sourceRef="A2_pickup_safe" targetRef="A2_pickup_pdone" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_10" name="First packing issue" sourceRef="A2_pickup_safe" targetRef="A2_pickup_repack" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_11" sourceRef="A2_pickup_repack" targetRef="A2_pickup_packing" />
+      <bpmn:sequenceFlow id="A2_pickup_Flow_12" name="Still unsafe" sourceRef="A2_pickup_safe" targetRef="A2_pickup_cancelled" />
+    </bpmn:subProcess>
+    <bpmn:parallelGateway id="A2_Shipment_Process_split" name="Move and update together">
+      <bpmn:incoming>A2_Shipment_Process_Flow_20</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_3</bpmn:outgoing>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_4</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:subProcess id="A2_transit" name="Transport parcel through each leg">
+      <bpmn:incoming>A2_Shipment_Process_Flow_3</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_5</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics isSequential="true">
+        <bpmn:loopCardinality>= numberOfLegs</bpmn:loopCardinality>
+      </bpmn:multiInstanceLoopCharacteristics>
+      <bpmn:startEvent id="A2_transit_t0" name="Start">
+        <bpmn:outgoing>A2_transit_Flow_1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:serviceTask id="A2_transit_scan" name="Sort parcel and record hub scan">
+        <bpmn:incoming>A2_transit_Flow_1</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_2</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="A2_transit_issue" name="Transit issue?">
+        <bpmn:incoming>A2_transit_Flow_2</bpmn:incoming>
+        <bpmn:incoming>A2_transit_Flow_4</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_5</bpmn:outgoing>
+        <bpmn:outgoing>A2_transit_Flow_6</bpmn:outgoing>
+        <bpmn:outgoing>A2_transit_Flow_11</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:endEvent id="A2_transit_tdone" name="Transport complete">
+        <bpmn:incoming>A2_transit_Flow_13</bpmn:incoming>
+        <bpmn:incoming>A2_transit_Flow_16</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:boundaryEvent id="A2_transit_scanerr" name="Scan failed" attachedToRef="A2_transit_scan">
+        <bpmn:outgoing>A2_transit_Flow_3</bpmn:outgoing>
+        <bpmn:errorEventDefinition errorRef="A2_error_SYSTEM" />
+      </bpmn:boundaryEvent>
+      <bpmn:userTask id="A2_transit_manual" name="Supervisor records and reconciles scan">
+        <bpmn:incoming>A2_transit_Flow_3</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_4</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:userTask id="A2_transit_claim" name="Inspect damage and agree claim">
+        <bpmn:documentation>Inspect damage and insurance. Agree replacement or reshipment where practical; otherwise record a refund or uninsured notice and return the parcel.</bpmn:documentation>
+        <bpmn:incoming>A2_transit_Flow_5</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_7</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A2_transit_cg" name="Parcel can continue?">
+        <bpmn:incoming>A2_transit_Flow_7</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_8</bpmn:outgoing>
+        <bpmn:outgoing>A2_transit_Flow_12</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sendTask id="A2_transit_docs" name="Request customs documents">
+        <bpmn:incoming>A2_transit_Flow_6</bpmn:incoming>
+        <bpmn:incoming>A2_transit_Flow_22</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_9</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:receiveTask id="A2_transit_received" name="Receive corrected documents" messageRef="A2_message_Documents">
+        <bpmn:documentation>Wait for documents; the following task checks correctness.</bpmn:documentation>
+        <bpmn:incoming>A2_transit_Flow_9</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_19</bpmn:outgoing>
+      </bpmn:receiveTask>
+      <bpmn:boundaryEvent id="A2_transit_docstime" name="5-day document deadline" attachedToRef="A2_transit_received">
+        <bpmn:outgoing>A2_transit_Flow_10</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P5D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:endEvent id="A2_transit_returnerror" name="Return parcel">
+        <bpmn:incoming>A2_transit_Flow_8</bpmn:incoming>
+        <bpmn:incoming>A2_transit_Flow_10</bpmn:incoming>
+        <bpmn:incoming>A2_transit_Flow_23</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="A2_error_RETURN" />
+      </bpmn:endEvent>
+      <bpmn:subProcess id="A2_movement" name="Movement and arrival">
+        <bpmn:incoming>A2_transit_Flow_11</bpmn:incoming>
+        <bpmn:incoming>A2_transit_Flow_12</bpmn:incoming>
+        <bpmn:incoming>A2_transit_Flow_21</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_13</bpmn:outgoing>
+        <bpmn:startEvent id="A2_movement_m0" name="Departure recorded">
+          <bpmn:outgoing>A2_movement_Flow_1</bpmn:outgoing>
+        </bpmn:startEvent>
+        <bpmn:serviceTask id="A2_movement_move" name="Move parcel to destination hub">
+          <bpmn:incoming>A2_movement_Flow_1</bpmn:incoming>
+          <bpmn:outgoing>A2_movement_Flow_2</bpmn:outgoing>
+        </bpmn:serviceTask>
+        <bpmn:eventBasedGateway id="A2_movement_event" name="Arrival or delay?">
+          <bpmn:incoming>A2_movement_Flow_2</bpmn:incoming>
+          <bpmn:incoming>A2_movement_Flow_9</bpmn:incoming>
+          <bpmn:outgoing>A2_movement_Flow_3</bpmn:outgoing>
+          <bpmn:outgoing>A2_movement_Flow_4</bpmn:outgoing>
+          <bpmn:outgoing>A2_movement_Flow_5</bpmn:outgoing>
+        </bpmn:eventBasedGateway>
+        <bpmn:intermediateCatchEvent id="A2_movement_arrival" name="Destination scan received">
+          <bpmn:incoming>A2_movement_Flow_3</bpmn:incoming>
+          <bpmn:outgoing>A2_movement_Flow_6</bpmn:outgoing>
+          <bpmn:messageEventDefinition messageRef="A2_message_Arrival" />
+        </bpmn:intermediateCatchEvent>
+        <bpmn:intermediateCatchEvent id="A2_movement_delay" name="Delay message received">
+          <bpmn:incoming>A2_movement_Flow_4</bpmn:incoming>
+          <bpmn:outgoing>A2_movement_Flow_7</bpmn:outgoing>
+          <bpmn:messageEventDefinition messageRef="A2_message_Delay" />
+        </bpmn:intermediateCatchEvent>
+        <bpmn:intermediateCatchEvent id="A2_movement_eta" name="ETA exceeded">
+          <bpmn:incoming>A2_movement_Flow_5</bpmn:incoming>
+          <bpmn:outgoing>A2_movement_Flow_8</bpmn:outgoing>
+          <bpmn:timerEventDefinition>
+            <bpmn:timeDuration>P1D</bpmn:timeDuration>
+          </bpmn:timerEventDefinition>
+        </bpmn:intermediateCatchEvent>
+        <bpmn:sendTask id="A2_movement_reroute" name="Notify delay and arrange alternate route">
+          <bpmn:incoming>A2_movement_Flow_7</bpmn:incoming>
+          <bpmn:incoming>A2_movement_Flow_8</bpmn:incoming>
+          <bpmn:outgoing>A2_movement_Flow_9</bpmn:outgoing>
+        </bpmn:sendTask>
+        <bpmn:endEvent id="A2_movement_mdone" name="Arrival confirmed">
+          <bpmn:incoming>A2_movement_Flow_6</bpmn:incoming>
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="A2_movement_Flow_1" sourceRef="A2_movement_m0" targetRef="A2_movement_move" />
+        <bpmn:sequenceFlow id="A2_movement_Flow_2" sourceRef="A2_movement_move" targetRef="A2_movement_event" />
+        <bpmn:sequenceFlow id="A2_movement_Flow_3" sourceRef="A2_movement_event" targetRef="A2_movement_arrival" />
+        <bpmn:sequenceFlow id="A2_movement_Flow_4" sourceRef="A2_movement_event" targetRef="A2_movement_delay" />
+        <bpmn:sequenceFlow id="A2_movement_Flow_5" sourceRef="A2_movement_event" targetRef="A2_movement_eta" />
+        <bpmn:sequenceFlow id="A2_movement_Flow_6" sourceRef="A2_movement_arrival" targetRef="A2_movement_mdone" />
+        <bpmn:sequenceFlow id="A2_movement_Flow_7" sourceRef="A2_movement_delay" targetRef="A2_movement_reroute" />
+        <bpmn:sequenceFlow id="A2_movement_Flow_8" sourceRef="A2_movement_eta" targetRef="A2_movement_reroute" />
+        <bpmn:sequenceFlow id="A2_movement_Flow_9" sourceRef="A2_movement_reroute" targetRef="A2_movement_event" />
+      </bpmn:subProcess>
+      <bpmn:boundaryEvent id="A2_transit_missing" name="No scan for 48 hours" attachedToRef="A2_movement">
+        <bpmn:outgoing>A2_transit_Flow_14</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>PT48H</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:userTask id="A2_transit_trace" name="Trace parcel and confirm arrival">
+        <bpmn:incoming>A2_transit_Flow_14</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_15</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A2_transit_found" name="Parcel found?">
+        <bpmn:incoming>A2_transit_Flow_15</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_16</bpmn:outgoing>
+        <bpmn:outgoing>A2_transit_Flow_17</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:boundaryEvent id="A2_transit_tracetime" name="Trace exceeds 5 days" attachedToRef="A2_transit_trace">
+        <bpmn:outgoing>A2_transit_Flow_18</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P5D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:endEvent id="A2_transit_losterror" name="Parcel lost">
+        <bpmn:incoming>A2_transit_Flow_17</bpmn:incoming>
+        <bpmn:incoming>A2_transit_Flow_18</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="A2_error_LOST" />
+      </bpmn:endEvent>
+      <bpmn:userTask id="A2_transit_checkdocs" name="Check documents and record correction count">
+        <bpmn:incoming>A2_transit_Flow_19</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_20</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A2_transit_docvalid" name="Documents accepted?">
+        <bpmn:incoming>A2_transit_Flow_20</bpmn:incoming>
+        <bpmn:outgoing>A2_transit_Flow_21</bpmn:outgoing>
+        <bpmn:outgoing>A2_transit_Flow_22</bpmn:outgoing>
+        <bpmn:outgoing>A2_transit_Flow_23</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="A2_transit_Flow_1" sourceRef="A2_transit_t0" targetRef="A2_transit_scan" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_2" sourceRef="A2_transit_scan" targetRef="A2_transit_issue" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_3" sourceRef="A2_transit_scanerr" targetRef="A2_transit_manual" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_4" sourceRef="A2_transit_manual" targetRef="A2_transit_issue" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_5" name="Damaged" sourceRef="A2_transit_issue" targetRef="A2_transit_claim" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_6" name="Customs hold" sourceRef="A2_transit_issue" targetRef="A2_transit_docs" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_7" sourceRef="A2_transit_claim" targetRef="A2_transit_cg" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_8" name="Refund or return" sourceRef="A2_transit_cg" targetRef="A2_transit_returnerror" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_9" sourceRef="A2_transit_docs" targetRef="A2_transit_received" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_10" sourceRef="A2_transit_docstime" targetRef="A2_transit_returnerror" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_11" name="Clear" sourceRef="A2_transit_issue" targetRef="A2_movement" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_12" name="Replace or continue" sourceRef="A2_transit_cg" targetRef="A2_movement" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_13" sourceRef="A2_movement" targetRef="A2_transit_tdone" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_14" sourceRef="A2_transit_missing" targetRef="A2_transit_trace" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_15" sourceRef="A2_transit_trace" targetRef="A2_transit_found" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_16" name="Yes" sourceRef="A2_transit_found" targetRef="A2_transit_tdone" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_17" name="No" sourceRef="A2_transit_found" targetRef="A2_transit_losterror" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_18" sourceRef="A2_transit_tracetime" targetRef="A2_transit_losterror" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_19" sourceRef="A2_transit_received" targetRef="A2_transit_checkdocs" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_20" sourceRef="A2_transit_checkdocs" targetRef="A2_transit_docvalid" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_21" name="Yes" sourceRef="A2_transit_docvalid" targetRef="A2_movement" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_22" name="One correction" sourceRef="A2_transit_docvalid" targetRef="A2_transit_docs" />
+      <bpmn:sequenceFlow id="A2_transit_Flow_23" name="Still invalid" sourceRef="A2_transit_docvalid" targetRef="A2_transit_returnerror" />
+    </bpmn:subProcess>
+    <bpmn:parallelGateway id="A2_Shipment_Process_join" name="Both branches complete">
+      <bpmn:incoming>A2_Shipment_Process_Flow_5</bpmn:incoming>
+      <bpmn:incoming>A2_Shipment_Process_Flow_6</bpmn:incoming>
+      <bpmn:incoming>A2_Shipment_Process_Flow_11</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_7</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:subProcess id="A2_delivery" name="Deliver parcel">
+      <bpmn:incoming>A2_Shipment_Process_Flow_7</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_8</bpmn:outgoing>
+      <bpmn:startEvent id="A2_delivery_d0" name="Start">
+        <bpmn:outgoing>A2_delivery_Flow_1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:sendTask id="A2_delivery_notify" name="Notify recipient of delivery">
+        <bpmn:incoming>A2_delivery_Flow_1</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_2</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:userTask id="A2_delivery_handover" name="Deliver parcel and capture proof">
+        <bpmn:documentation>Record the delivery outcome and increment the attempt count when the recipient is unavailable.</bpmn:documentation>
+        <bpmn:incoming>A2_delivery_Flow_2</bpmn:incoming>
+        <bpmn:incoming>A2_delivery_Flow_8</bpmn:incoming>
+        <bpmn:incoming>A2_delivery_Flow_18</bpmn:incoming>
+        <bpmn:incoming>A2_delivery_Flow_21</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_3</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A2_delivery_result" name="Delivery result">
+        <bpmn:incoming>A2_delivery_Flow_3</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_4</bpmn:outgoing>
+        <bpmn:outgoing>A2_delivery_Flow_5</bpmn:outgoing>
+        <bpmn:outgoing>A2_delivery_Flow_6</bpmn:outgoing>
+        <bpmn:outgoing>A2_delivery_Flow_13</bpmn:outgoing>
+        <bpmn:outgoing>A2_delivery_Flow_15</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:userTask id="A2_delivery_evidence" name="Verify delivery proof or recipient receipt">
+        <bpmn:documentation>Complete only when delivery proof is recovered or receipt is verified directly with the recipient. Otherwise keep this task open.</bpmn:documentation>
+        <bpmn:incoming>A2_delivery_Flow_4</bpmn:incoming>
+        <bpmn:incoming>A2_delivery_Flow_11</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_12</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:endEvent id="A2_delivery_ddone" name="Delivery confirmed">
+        <bpmn:incoming>A2_delivery_Flow_12</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:userTask id="A2_delivery_address" name="Correct address and agree any surcharge">
+        <bpmn:incoming>A2_delivery_Flow_5</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_20</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:intermediateCatchEvent id="A2_delivery_wait" name="Reattempt next day">
+        <bpmn:incoming>A2_delivery_Flow_7</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_8</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P1D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:intermediateCatchEvent>
+      <bpmn:exclusiveGateway id="A2_delivery_attempts" name="Fewer than 3 attempts?">
+        <bpmn:incoming>A2_delivery_Flow_6</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_7</bpmn:outgoing>
+        <bpmn:outgoing>A2_delivery_Flow_9</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:receiveTask id="A2_delivery_hold" name="Wait for depot collection" messageRef="A2_message_Collection">
+        <bpmn:incoming>A2_delivery_Flow_9</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_10</bpmn:outgoing>
+      </bpmn:receiveTask>
+      <bpmn:userTask id="A2_delivery_identity" name="Verify collector and record proof">
+        <bpmn:incoming>A2_delivery_Flow_10</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_11</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:boundaryEvent id="A2_delivery_holdtime" name="7-day hold expired" attachedToRef="A2_delivery_hold">
+        <bpmn:outgoing>A2_delivery_Flow_14</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P7D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:endEvent id="A2_delivery_returnerror" name="Return to sender">
+        <bpmn:incoming>A2_delivery_Flow_13</bpmn:incoming>
+        <bpmn:incoming>A2_delivery_Flow_14</bpmn:incoming>
+        <bpmn:incoming>A2_delivery_Flow_19</bpmn:incoming>
+        <bpmn:incoming>A2_delivery_Flow_22</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="A2_error_RETURN" />
+      </bpmn:endEvent>
+      <bpmn:userTask id="A2_delivery_damage" name="Inspect delivery damage and agree claim">
+        <bpmn:incoming>A2_delivery_Flow_15</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_16</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A2_delivery_damagechoice" name="Replacement agreed?">
+        <bpmn:incoming>A2_delivery_Flow_16</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_17</bpmn:outgoing>
+        <bpmn:outgoing>A2_delivery_Flow_19</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="A2_delivery_replace" name="Provide replacement parcel">
+        <bpmn:incoming>A2_delivery_Flow_17</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_18</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="A2_delivery_surcharge" name="Address change agreed?">
+        <bpmn:incoming>A2_delivery_Flow_20</bpmn:incoming>
+        <bpmn:outgoing>A2_delivery_Flow_21</bpmn:outgoing>
+        <bpmn:outgoing>A2_delivery_Flow_22</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="A2_delivery_Flow_1" sourceRef="A2_delivery_d0" targetRef="A2_delivery_notify" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_2" sourceRef="A2_delivery_notify" targetRef="A2_delivery_handover" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_3" sourceRef="A2_delivery_handover" targetRef="A2_delivery_result" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_4" name="Delivered" sourceRef="A2_delivery_result" targetRef="A2_delivery_evidence" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_5" name="Wrong address" sourceRef="A2_delivery_result" targetRef="A2_delivery_address" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_6" name="Unavailable" sourceRef="A2_delivery_result" targetRef="A2_delivery_attempts" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_7" name="Yes" sourceRef="A2_delivery_attempts" targetRef="A2_delivery_wait" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_8" sourceRef="A2_delivery_wait" targetRef="A2_delivery_handover" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_9" name="No" sourceRef="A2_delivery_attempts" targetRef="A2_delivery_hold" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_10" sourceRef="A2_delivery_hold" targetRef="A2_delivery_identity" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_11" sourceRef="A2_delivery_identity" targetRef="A2_delivery_evidence" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_12" sourceRef="A2_delivery_evidence" targetRef="A2_delivery_ddone" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_13" name="Refused or COD failed" sourceRef="A2_delivery_result" targetRef="A2_delivery_returnerror" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_14" sourceRef="A2_delivery_holdtime" targetRef="A2_delivery_returnerror" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_15" name="Damaged" sourceRef="A2_delivery_result" targetRef="A2_delivery_damage" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_16" sourceRef="A2_delivery_damage" targetRef="A2_delivery_damagechoice" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_17" name="Yes" sourceRef="A2_delivery_damagechoice" targetRef="A2_delivery_replace" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_18" sourceRef="A2_delivery_replace" targetRef="A2_delivery_handover" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_19" name="No" sourceRef="A2_delivery_damagechoice" targetRef="A2_delivery_returnerror" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_20" sourceRef="A2_delivery_address" targetRef="A2_delivery_surcharge" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_21" name="Yes" sourceRef="A2_delivery_surcharge" targetRef="A2_delivery_handover" />
+      <bpmn:sequenceFlow id="A2_delivery_Flow_22" name="No" sourceRef="A2_delivery_surcharge" targetRef="A2_delivery_returnerror" />
+    </bpmn:subProcess>
+    <bpmn:serviceTask id="A2_Shipment_Process_close" name="Close shipment and issue invoice">
+      <bpmn:incoming>A2_Shipment_Process_Flow_8</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_9</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="A2_Shipment_Process_done" name="Shipment delivered">
+      <bpmn:incoming>A2_Shipment_Process_Flow_9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sendTask id="A2_Shipment_Process_tracking" name="Update tracking and notify shipper">
+      <bpmn:incoming>A2_Shipment_Process_Flow_4</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_6</bpmn:outgoing>
+    </bpmn:sendTask>
+    <bpmn:userTask id="A2_Shipment_Process_trackmanual" name="Supervisor updates tracking manually">
+      <bpmn:incoming>A2_Shipment_Process_Flow_10</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_11</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:serviceTask id="A2_Shipment_Process_cancelnotice" name="Cancel booking and apply fee">
+      <bpmn:incoming>A2_Shipment_Process_Flow_12</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_13</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="A2_Shipment_Process_return" name="Return parcel and adjust return charges">
+      <bpmn:documentation>Intercept an in-transit parcel where necessary, return it to the sender, notify the parties and settle charges, without duplicating a cancellation refund already handled by compensation.</bpmn:documentation>
+      <bpmn:incoming>A2_Shipment_Process_Flow_14</bpmn:incoming>
+      <bpmn:incoming>A2_Shipment_Process_Flow_15</bpmn:incoming>
+      <bpmn:incoming>A2_Shipment_Process_Flow_22</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_16</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="A2_Shipment_Process_charge" name="Record shipment charge">
+      <bpmn:incoming>A2_Shipment_Process_Flow_19</bpmn:incoming>
+      <bpmn:outgoing>A2_Shipment_Process_Flow_20</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="A2_Shipment_Process_refund" name="Refund charge minus cancellation fee" isForCompensation="true" />
+    <bpmn:boundaryEvent id="A2_Shipment_Process_bookingerr" name="Invalid booking" attachedToRef="A2_booking">
+      <bpmn:outgoing>A2_Shipment_Process_bookingerrflow</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="A2_error_INVALID_BOOKING" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A2_Shipment_Process_returntransit" name="Return required" attachedToRef="A2_transit">
+      <bpmn:outgoing>A2_Shipment_Process_Flow_14</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="A2_error_RETURN" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A2_Shipment_Process_trackerr" name="Tracking failed" attachedToRef="A2_Shipment_Process_tracking">
+      <bpmn:outgoing>A2_Shipment_Process_Flow_10</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="A2_error_SYSTEM" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A2_Shipment_Process_pickerr" name="Pickup cancelled" attachedToRef="A2_pickup">
+      <bpmn:outgoing>A2_Shipment_Process_Flow_12</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="A2_error_CANCEL" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A2_Shipment_Process_returndelivery" name="Return required" attachedToRef="A2_delivery">
+      <bpmn:outgoing>A2_Shipment_Process_Flow_15</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="A2_error_RETURN" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A2_Shipment_Process_cancel" name="Cancellation received" attachedToRef="A2_transit">
+      <bpmn:outgoing>A2_Shipment_Process_Flow_21</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="A2_message_Cancellation" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A2_Shipment_Process_lostcatch" name="Lost after tracing" attachedToRef="A2_transit">
+      <bpmn:outgoing>A2_Shipment_Process_Flow_18</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="A2_error_LOST" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A2_Shipment_Process_chargecomp" name="Compensation" cancelActivity="false" attachedToRef="A2_Shipment_Process_charge">
+      <bpmn:compensateEventDefinition />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_1" sourceRef="A2_Shipment_Process_s" targetRef="A2_booking" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_18" sourceRef="A2_Shipment_Process_lostcatch" targetRef="A2_Shipment_Process_compensate" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_17" sourceRef="A2_Shipment_Process_compensate" targetRef="A2_Shipment_Process_lost" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_21" sourceRef="A2_Shipment_Process_cancel" targetRef="A2_Shipment_Process_refundthrow" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_22" sourceRef="A2_Shipment_Process_refundthrow" targetRef="A2_Shipment_Process_return" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_bookingerrflow" sourceRef="A2_Shipment_Process_bookingerr" targetRef="A2_Shipment_Process_bookingclosed" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_13" sourceRef="A2_Shipment_Process_cancelnotice" targetRef="A2_Shipment_Process_cancelend" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_16" sourceRef="A2_Shipment_Process_return" targetRef="A2_Shipment_Process_returned" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_2" sourceRef="A2_booking" targetRef="A2_pickup" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_19" sourceRef="A2_pickup" targetRef="A2_Shipment_Process_charge" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_20" sourceRef="A2_Shipment_Process_charge" targetRef="A2_Shipment_Process_split" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_3" sourceRef="A2_Shipment_Process_split" targetRef="A2_transit" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_4" sourceRef="A2_Shipment_Process_split" targetRef="A2_Shipment_Process_tracking" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_5" sourceRef="A2_transit" targetRef="A2_Shipment_Process_join" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_6" sourceRef="A2_Shipment_Process_tracking" targetRef="A2_Shipment_Process_join" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_11" sourceRef="A2_Shipment_Process_trackmanual" targetRef="A2_Shipment_Process_join" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_7" sourceRef="A2_Shipment_Process_join" targetRef="A2_delivery" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_8" sourceRef="A2_delivery" targetRef="A2_Shipment_Process_close" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_9" sourceRef="A2_Shipment_Process_close" targetRef="A2_Shipment_Process_done" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_10" sourceRef="A2_Shipment_Process_trackerr" targetRef="A2_Shipment_Process_trackmanual" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_12" sourceRef="A2_Shipment_Process_pickerr" targetRef="A2_Shipment_Process_cancelnotice" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_14" sourceRef="A2_Shipment_Process_returntransit" targetRef="A2_Shipment_Process_return" />
+    <bpmn:sequenceFlow id="A2_Shipment_Process_Flow_15" sourceRef="A2_Shipment_Process_returndelivery" targetRef="A2_Shipment_Process_return" />
+    <bpmn:association id="A2_Shipment_Process_Association_0" associationDirection="One" sourceRef="A2_Shipment_Process_chargecomp" targetRef="A2_Shipment_Process_refund" />
+  </bpmn:process>
+  <bpmn:collaboration id="A2_Collaboration">
+    <bpmn:participant id="A2_Pool" name="Logistics and Shipment Exception Management" processRef="A2_Shipment_Process" />
+  </bpmn:collaboration>
+  <bpmn:error id="A2_error_SYSTEM" name="SYSTEM" errorCode="SYSTEM" />
+  <bpmn:error id="A2_error_CANCEL" name="CANCEL" errorCode="CANCEL" />
+  <bpmn:error id="A2_error_RETURN" name="RETURN" errorCode="RETURN" />
+  <bpmn:message id="A2_message_Cancellation" name="Cancellation" />
+  <bpmn:error id="A2_error_LOST" name="LOST" errorCode="LOST" />
+  <bpmn:message id="A2_message_Documents" name="Documents" />
+  <bpmn:message id="A2_message_Collection" name="Collection" />
+  <bpmn:message id="A2_message_Arrival" name="Arrival" />
+  <bpmn:message id="A2_message_Delay" name="Delay" />
+  <bpmn:error id="A2_error_INVALID_BOOKING" name="INVALID_BOOKING" errorCode="INVALID_BOOKING" />
+  <bpmndi:BPMNDiagram id="A2_Diagram_Shipment_Process">
+    <bpmndi:BPMNPlane id="A2_Plane_Shipment_Process" bpmnElement="A2_Collaboration">
+      <bpmndi:BPMNShape id="A2_Pool_di" bpmnElement="A2_Pool" isHorizontal="false">
+        <dc:Bounds x="160" y="70" width="1900" height="2650" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_MainLane_di" bpmnElement="A2_MainLane" isHorizontal="false">
+        <dc:Bounds x="200" y="70" width="700" height="2650" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_SupportLane_di" bpmnElement="A2_SupportLane" isHorizontal="false">
+        <dc:Bounds x="900" y="70" width="1160" height="2650" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_s_di" bpmnElement="A2_Shipment_Process_s">
+        <dc:Bounds x="525" y="150" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="507" y="200" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_compensate_di" bpmnElement="A2_Shipment_Process_compensate">
+        <dc:Bounds x="1130" y="1910" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_lost_di" bpmnElement="A2_Shipment_Process_lost">
+        <dc:Bounds x="1510" y="1930" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1504" y="1980" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_refundthrow_di" bpmnElement="A2_Shipment_Process_refundthrow">
+        <dc:Bounds x="1200" y="1700" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1147" y="1750" width="147" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_bookingclosed_di" bpmnElement="A2_Shipment_Process_bookingclosed">
+        <dc:Bounds x="1170" y="380" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1133" y="430" width="114" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_cancelend_di" bpmnElement="A2_Shipment_Process_cancelend">
+        <dc:Bounds x="1540" y="693" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1515" y="743" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_returned_di" bpmnElement="A2_Shipment_Process_returned">
+        <dc:Bounds x="1610" y="2243" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1583" y="2293" width="95" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_split_di" bpmnElement="A2_Shipment_Process_split">
+        <dc:Bounds x="515" y="1110" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="401" y="1178" width="129" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_join_di" bpmnElement="A2_Shipment_Process_join">
+        <dc:Bounds x="515" y="1740" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="495" y="1813" width="119" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_close_di" bpmnElement="A2_Shipment_Process_close">
+        <dc:Bounds x="440" y="2200" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_done_di" bpmnElement="A2_Shipment_Process_done">
+        <dc:Bounds x="525" y="2440" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="498" y="2490" width="95" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_tracking_di" bpmnElement="A2_Shipment_Process_tracking">
+        <dc:Bounds x="1110" y="1290" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_trackmanual_di" bpmnElement="A2_Shipment_Process_trackmanual">
+        <dc:Bounds x="1480" y="1530" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_cancelnotice_di" bpmnElement="A2_Shipment_Process_cancelnotice">
+        <dc:Bounds x="1100" y="670" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_return_di" bpmnElement="A2_Shipment_Process_return">
+        <dc:Bounds x="1170" y="2220" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_charge_di" bpmnElement="A2_Shipment_Process_charge">
+        <dc:Bounds x="440" y="910" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_refund_di" bpmnElement="A2_Shipment_Process_refund">
+        <dc:Bounds x="1120" y="900" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_booking_di" bpmnElement="A2_booking" isExpanded="false">
+        <dc:Bounds x="430" y="350" width="230" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_di" bpmnElement="A2_pickup" isExpanded="false">
+        <dc:Bounds x="430" y="630" width="230" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_di" bpmnElement="A2_transit" isExpanded="false">
+        <dc:Bounds x="430" y="1330" width="230" height="180" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_di" bpmnElement="A2_delivery" isExpanded="false">
+        <dc:Bounds x="430" y="1940" width="230" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Association_0_di" bpmnElement="A2_Shipment_Process_Association_0">
+        <di:waypoint x="670" y="952.5" />
+        <di:waypoint x="695" y="952.5" />
+        <di:waypoint x="695" y="942.5" />
+        <di:waypoint x="1095" y="942.5" />
+        <di:waypoint x="1120" y="942.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_bookingerr_di" bpmnElement="A2_Shipment_Process_bookingerr">
+        <dc:Bounds x="640" y="380" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="698" y="388" width="74" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_returntransit_di" bpmnElement="A2_Shipment_Process_returntransit">
+        <dc:Bounds x="640" y="1355" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="697" y="1363" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_trackerr_di" bpmnElement="A2_Shipment_Process_trackerr">
+        <dc:Bounds x="1300" y="1313" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1359" y="1321" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_pickerr_di" bpmnElement="A2_Shipment_Process_pickerr">
+        <dc:Bounds x="640" y="660" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="695" y="668" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_returndelivery_di" bpmnElement="A2_Shipment_Process_returndelivery">
+        <dc:Bounds x="640" y="1970" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="697" y="1978" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_cancel_di" bpmnElement="A2_Shipment_Process_cancel">
+        <dc:Bounds x="640" y="1400" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="698" y="1404" width="106" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_lostcatch_di" bpmnElement="A2_Shipment_Process_lostcatch">
+        <dc:Bounds x="640" y="1445" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="701" y="1453" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_Shipment_Process_chargecomp_di" bpmnElement="A2_Shipment_Process_chargecomp">
+        <dc:Bounds x="630" y="933" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="690" y="941" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_1_di" bpmnElement="A2_Shipment_Process_Flow_1">
+        <di:waypoint x="545" y="190" />
+        <di:waypoint x="545" y="215" />
+        <di:waypoint x="545" y="325" />
+        <di:waypoint x="545" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_18_di" bpmnElement="A2_Shipment_Process_Flow_18">
+        <di:waypoint x="680" y="1465" />
+        <di:waypoint x="705" y="1465" />
+        <di:waypoint x="705" y="1952.5" />
+        <di:waypoint x="1105" y="1952.5" />
+        <di:waypoint x="1130" y="1952.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_17_di" bpmnElement="A2_Shipment_Process_Flow_17">
+        <di:waypoint x="1340" y="1952.5" />
+        <di:waypoint x="1365" y="1952.5" />
+        <di:waypoint x="1365" y="1950" />
+        <di:waypoint x="1485" y="1950" />
+        <di:waypoint x="1510" y="1950" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_21_di" bpmnElement="A2_Shipment_Process_Flow_21">
+        <di:waypoint x="680" y="1420" />
+        <di:waypoint x="705" y="1420" />
+        <di:waypoint x="1175" y="1420" />
+        <di:waypoint x="1175" y="1720" />
+        <di:waypoint x="1200" y="1720" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_22_di" bpmnElement="A2_Shipment_Process_Flow_22">
+        <di:waypoint x="1220" y="1740" />
+        <di:waypoint x="1220" y="1765" />
+        <di:waypoint x="1352" y="1765" />
+        <di:waypoint x="1352" y="2195" />
+        <di:waypoint x="1275" y="2195" />
+        <di:waypoint x="1275" y="2220" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_bookingerrflow_di" bpmnElement="A2_Shipment_Process_bookingerrflow">
+        <di:waypoint x="680" y="400" />
+        <di:waypoint x="1170" y="400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_13_di" bpmnElement="A2_Shipment_Process_Flow_13">
+        <di:waypoint x="1310" y="713" />
+        <di:waypoint x="1450" y="713" />
+        <di:waypoint x="1540" y="713" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_16_di" bpmnElement="A2_Shipment_Process_Flow_16">
+        <di:waypoint x="1380" y="2263" />
+        <di:waypoint x="1610" y="2263" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_2_di" bpmnElement="A2_Shipment_Process_Flow_2">
+        <di:waypoint x="545" y="450" />
+        <di:waypoint x="545" y="475" />
+        <di:waypoint x="545" y="605" />
+        <di:waypoint x="545" y="630" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_19_di" bpmnElement="A2_Shipment_Process_Flow_19">
+        <di:waypoint x="545" y="730" />
+        <di:waypoint x="545" y="755" />
+        <di:waypoint x="545" y="885" />
+        <di:waypoint x="545" y="910" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_20_di" bpmnElement="A2_Shipment_Process_Flow_20">
+        <di:waypoint x="545" y="995" />
+        <di:waypoint x="545" y="1020" />
+        <di:waypoint x="545" y="1085" />
+        <di:waypoint x="545" y="1110" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_3_di" bpmnElement="A2_Shipment_Process_Flow_3">
+        <di:waypoint x="545" y="1170" />
+        <di:waypoint x="545" y="1195" />
+        <di:waypoint x="545" y="1305" />
+        <di:waypoint x="545" y="1330" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_4_di" bpmnElement="A2_Shipment_Process_Flow_4">
+        <di:waypoint x="575" y="1140" />
+        <di:waypoint x="600" y="1140" />
+        <di:waypoint x="1085" y="1140" />
+        <di:waypoint x="1085" y="1332.5" />
+        <di:waypoint x="1110" y="1332.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_5_di" bpmnElement="A2_Shipment_Process_Flow_5">
+        <di:waypoint x="545" y="1510" />
+        <di:waypoint x="545" y="1535" />
+        <di:waypoint x="545" y="1715" />
+        <di:waypoint x="545" y="1740" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_6_di" bpmnElement="A2_Shipment_Process_Flow_6">
+        <di:waypoint x="1110" y="1332.5" />
+        <di:waypoint x="1085" y="1332.5" />
+        <di:waypoint x="1085" y="1770" />
+        <di:waypoint x="600" y="1770" />
+        <di:waypoint x="575" y="1770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_11_di" bpmnElement="A2_Shipment_Process_Flow_11">
+        <di:waypoint x="1480" y="1572.5" />
+        <di:waypoint x="1455" y="1572.5" />
+        <di:waypoint x="600" y="1572.5" />
+        <di:waypoint x="600" y="1770" />
+        <di:waypoint x="575" y="1770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_7_di" bpmnElement="A2_Shipment_Process_Flow_7">
+        <di:waypoint x="545" y="1800" />
+        <di:waypoint x="545" y="1825" />
+        <di:waypoint x="545" y="1915" />
+        <di:waypoint x="545" y="1940" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_8_di" bpmnElement="A2_Shipment_Process_Flow_8">
+        <di:waypoint x="545" y="2040" />
+        <di:waypoint x="545" y="2065" />
+        <di:waypoint x="545" y="2175" />
+        <di:waypoint x="545" y="2200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_9_di" bpmnElement="A2_Shipment_Process_Flow_9">
+        <di:waypoint x="545" y="2285" />
+        <di:waypoint x="545" y="2310" />
+        <di:waypoint x="545" y="2415" />
+        <di:waypoint x="545" y="2440" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_10_di" bpmnElement="A2_Shipment_Process_Flow_10">
+        <di:waypoint x="1340" y="1332.5" />
+        <di:waypoint x="1365" y="1332.5" />
+        <di:waypoint x="1455" y="1332.5" />
+        <di:waypoint x="1455" y="1572.5" />
+        <di:waypoint x="1480" y="1572.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_12_di" bpmnElement="A2_Shipment_Process_Flow_12">
+        <di:waypoint x="680" y="680" />
+        <di:waypoint x="705" y="680" />
+        <di:waypoint x="705" y="712.5" />
+        <di:waypoint x="1075" y="712.5" />
+        <di:waypoint x="1100" y="712.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_14_di" bpmnElement="A2_Shipment_Process_Flow_14">
+        <di:waypoint x="680" y="1375" />
+        <di:waypoint x="705" y="1375" />
+        <di:waypoint x="1098" y="1375" />
+        <di:waypoint x="1098" y="2262.5" />
+        <di:waypoint x="1145" y="2262.5" />
+        <di:waypoint x="1170" y="2262.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_Shipment_Process_Flow_15_di" bpmnElement="A2_Shipment_Process_Flow_15">
+        <di:waypoint x="680" y="1990" />
+        <di:waypoint x="705" y="1990" />
+        <di:waypoint x="705" y="2262.5" />
+        <di:waypoint x="1145" y="2262.5" />
+        <di:waypoint x="1170" y="2262.5" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="A2_Diagram_booking">
+    <bpmndi:BPMNPlane id="A2_Plane_booking" bpmnElement="A2_booking">
+      <bpmndi:BPMNShape id="A2_booking_b0_di" bpmnElement="A2_booking_b0">
+        <dc:Bounds x="230" y="100" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="238" y="150" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_booking_book_di" bpmnElement="A2_booking_book">
+        <dc:Bounds x="170" y="280" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_booking_price_di" bpmnElement="A2_booking_price">
+        <dc:Bounds x="170" y="510" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_booking_valid_di" bpmnElement="A2_booking_valid" isMarkerVisible="true">
+        <dc:Bounds x="240" y="760" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="154" y="793" width="72" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_booking_schedule_di" bpmnElement="A2_booking_schedule">
+        <dc:Bounds x="170" y="1020" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_booking_bdone_di" bpmnElement="A2_booking_bdone">
+        <dc:Bounds x="240" y="1250" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="219" y="1300" width="83" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_booking_retry_di" bpmnElement="A2_booking_retry" isMarkerVisible="true">
+        <dc:Bounds x="670" y="760" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="672" y="820" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_booking_invalid_di" bpmnElement="A2_booking_invalid">
+        <dc:Bounds x="1020" y="1030" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="975" y="1080" width="131" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A2_booking_Flow_1_di" bpmnElement="A2_booking_Flow_1">
+        <di:waypoint x="250" y="140" />
+        <di:waypoint x="250" y="165" />
+        <di:waypoint x="250" y="255" />
+        <di:waypoint x="275" y="255" />
+        <di:waypoint x="275" y="280" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_booking_Flow_2_di" bpmnElement="A2_booking_Flow_2">
+        <di:waypoint x="275" y="365" />
+        <di:waypoint x="275" y="390" />
+        <di:waypoint x="275" y="485" />
+        <di:waypoint x="275" y="510" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_booking_Flow_3_di" bpmnElement="A2_booking_Flow_3">
+        <di:waypoint x="275" y="595" />
+        <di:waypoint x="275" y="620" />
+        <di:waypoint x="275" y="735" />
+        <di:waypoint x="270" y="735" />
+        <di:waypoint x="270" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_booking_Flow_4_di" bpmnElement="A2_booking_Flow_4">
+        <di:waypoint x="270" y="820" />
+        <di:waypoint x="270" y="845" />
+        <di:waypoint x="270" y="995" />
+        <di:waypoint x="275" y="995" />
+        <di:waypoint x="275" y="1020" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="285" y="833" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_booking_Flow_5_di" bpmnElement="A2_booking_Flow_5">
+        <di:waypoint x="300" y="790" />
+        <di:waypoint x="325" y="790" />
+        <di:waypoint x="645" y="790" />
+        <di:waypoint x="670" y="790" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="326" y="773" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_booking_Flow_6_di" bpmnElement="A2_booking_Flow_6">
+        <di:waypoint x="275" y="1105" />
+        <di:waypoint x="275" y="1130" />
+        <di:waypoint x="275" y="1225" />
+        <di:waypoint x="260" y="1225" />
+        <di:waypoint x="260" y="1250" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_booking_retry_yes_di" bpmnElement="A2_booking_retry_yes">
+        <di:waypoint x="670" y="790" />
+        <di:waypoint x="645" y="790" />
+        <di:waypoint x="645" y="322.5" />
+        <di:waypoint x="380" y="323" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="544" y="683" width="92" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_booking_retry_no_di" bpmnElement="A2_booking_retry_no">
+        <di:waypoint x="730" y="790" />
+        <di:waypoint x="755" y="790" />
+        <di:waypoint x="755" y="1050" />
+        <di:waypoint x="995" y="1050" />
+        <di:waypoint x="1020" y="1050" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="686" y="913" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="A2_Diagram_pickup">
+    <bpmndi:BPMNPlane id="A2_Plane_pickup" bpmnElement="A2_pickup">
+      <bpmndi:BPMNShape id="A2_pickup_p0_di" bpmnElement="A2_pickup_p0">
+        <dc:Bounds x="360" y="100" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="335" y="150" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_collect_di" bpmnElement="A2_pickup_collect">
+        <dc:Bounds x="300" y="300" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_pg_di" bpmnElement="A2_pickup_pg" isMarkerVisible="true">
+        <dc:Bounds x="370" y="550" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="298" y="573" width="63" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_packing_di" bpmnElement="A2_pickup_packing">
+        <dc:Bounds x="300" y="830" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_safe_di" bpmnElement="A2_pickup_safe" isMarkerVisible="true">
+        <dc:Bounds x="370" y="1070" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="279" y="1093" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_pdone_di" bpmnElement="A2_pickup_pdone">
+        <dc:Bounds x="370" y="1380" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="343.6" y="1430" width="92.8" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_reschedule_di" bpmnElement="A2_pickup_reschedule">
+        <dc:Bounds x="800" y="550" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_wait_di" bpmnElement="A2_pickup_wait">
+        <dc:Bounds x="860" y="820" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="824.9" y="870" width="110.2" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_repack_di" bpmnElement="A2_pickup_repack">
+        <dc:Bounds x="800" y="1070" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_pickup_cancelled_di" bpmnElement="A2_pickup_cancelled">
+        <dc:Bounds x="1210" y="1330" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1195" y="1380" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_1_di" bpmnElement="A2_pickup_Flow_1">
+        <di:waypoint x="380" y="140" />
+        <di:waypoint x="380" y="165" />
+        <di:waypoint x="380" y="275" />
+        <di:waypoint x="405" y="275" />
+        <di:waypoint x="405" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_2_di" bpmnElement="A2_pickup_Flow_2">
+        <di:waypoint x="405" y="385" />
+        <di:waypoint x="405" y="410" />
+        <di:waypoint x="405" y="525" />
+        <di:waypoint x="400" y="525" />
+        <di:waypoint x="400" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_3_di" bpmnElement="A2_pickup_Flow_3">
+        <di:waypoint x="400" y="610" />
+        <di:waypoint x="400" y="635" />
+        <di:waypoint x="400" y="805" />
+        <di:waypoint x="405" y="805" />
+        <di:waypoint x="405" y="830" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="407" y="683" width="46" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_4_di" bpmnElement="A2_pickup_Flow_4">
+        <di:waypoint x="430" y="580" />
+        <di:waypoint x="455" y="580" />
+        <di:waypoint x="455" y="592.5" />
+        <di:waypoint x="775" y="592.5" />
+        <di:waypoint x="800" y="592.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="512" y="603" width="55" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_5_di" bpmnElement="A2_pickup_Flow_5">
+        <di:waypoint x="430" y="580" />
+        <di:waypoint x="778" y="580" />
+        <di:waypoint x="778" y="1350" />
+        <di:waypoint x="1210" y="1350" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="855" y="575" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_6_di" bpmnElement="A2_pickup_Flow_6">
+        <di:waypoint x="905" y="635" />
+        <di:waypoint x="905" y="660" />
+        <di:waypoint x="905" y="795" />
+        <di:waypoint x="880" y="795" />
+        <di:waypoint x="880" y="820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_7_di" bpmnElement="A2_pickup_Flow_7">
+        <di:waypoint x="860" y="840" />
+        <di:waypoint x="835" y="840" />
+        <di:waypoint x="835" y="645" />
+        <di:waypoint x="275" y="645" />
+        <di:waypoint x="275" y="342.5" />
+        <di:waypoint x="300" y="342.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_8_di" bpmnElement="A2_pickup_Flow_8">
+        <di:waypoint x="405" y="915" />
+        <di:waypoint x="405" y="940" />
+        <di:waypoint x="405" y="1045" />
+        <di:waypoint x="400" y="1045" />
+        <di:waypoint x="400" y="1070" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_9_di" bpmnElement="A2_pickup_Flow_9">
+        <di:waypoint x="400" y="1130" />
+        <di:waypoint x="400" y="1155" />
+        <di:waypoint x="400" y="1355" />
+        <di:waypoint x="390" y="1355" />
+        <di:waypoint x="390" y="1380" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="392" y="1142.5" width="64" height="25" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_10_di" bpmnElement="A2_pickup_Flow_10">
+        <di:waypoint x="430" y="1100" />
+        <di:waypoint x="455" y="1100" />
+        <di:waypoint x="455" y="1112.5" />
+        <di:waypoint x="775" y="1112.5" />
+        <di:waypoint x="800" y="1112.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="464" y="1093" width="92" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_11_di" bpmnElement="A2_pickup_Flow_11">
+        <di:waypoint x="800" y="1110" />
+        <di:waypoint x="775" y="1110" />
+        <di:waypoint x="775" y="872.5" />
+        <di:waypoint x="510" y="873" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_pickup_Flow_12_di" bpmnElement="A2_pickup_Flow_12">
+        <di:waypoint x="430" y="1100" />
+        <di:waypoint x="455" y="1100" />
+        <di:waypoint x="455" y="1345" />
+        <di:waypoint x="1185" y="1345" />
+        <di:waypoint x="1185" y="1350" />
+        <di:waypoint x="1210" y="1350" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="463" y="1148" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="A2_Diagram_transit">
+    <bpmndi:BPMNPlane id="A2_Plane_transit" bpmnElement="A2_transit">
+      <bpmndi:BPMNShape id="A2_transit_t0_di" bpmnElement="A2_transit_t0">
+        <dc:Bounds x="380" y="100" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="355" y="150" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_scan_di" bpmnElement="A2_transit_scan">
+        <dc:Bounds x="320" y="300" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_issue_di" bpmnElement="A2_transit_issue" isMarkerVisible="true">
+        <dc:Bounds x="390" y="560" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="306" y="583" width="69" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_tdone_di" bpmnElement="A2_transit_tdone">
+        <dc:Bounds x="390" y="1650" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="357.8" y="1700" width="104.4" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_manual_di" bpmnElement="A2_transit_manual">
+        <dc:Bounds x="790" y="300" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_claim_di" bpmnElement="A2_transit_claim">
+        <dc:Bounds x="790" y="560" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_cg_di" bpmnElement="A2_transit_cg" isMarkerVisible="true">
+        <dc:Bounds x="860" y="830" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="828" y="903" width="103" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_docs_di" bpmnElement="A2_transit_docs">
+        <dc:Bounds x="1230" y="560" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_received_di" bpmnElement="A2_transit_received">
+        <dc:Bounds x="1230" y="830" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_returnerror_di" bpmnElement="A2_transit_returnerror">
+        <dc:Bounds x="1600" y="1670" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1575" y="1720" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_movement_di" bpmnElement="A2_movement" isExpanded="false">
+        <dc:Bounds x="320" y="980" width="230" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_trace_di" bpmnElement="A2_transit_trace">
+        <dc:Bounds x="790" y="1050" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_found_di" bpmnElement="A2_transit_found" isMarkerVisible="true">
+        <dc:Bounds x="860" y="1350" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="746" y="1363" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_losterror_di" bpmnElement="A2_transit_losterror">
+        <dc:Bounds x="1220" y="1670" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1195" y="1720" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_checkdocs_di" bpmnElement="A2_transit_checkdocs">
+        <dc:Bounds x="1230" y="1100" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_docvalid_di" bpmnElement="A2_transit_docvalid" isMarkerVisible="true">
+        <dc:Bounds x="1300" y="1370" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1195" y="1423" width="110" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_tracetime_di" bpmnElement="A2_transit_tracetime">
+        <dc:Bounds x="980" y="1072.5" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1030" y="1080.5" width="116" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_missing_di" bpmnElement="A2_transit_missing">
+        <dc:Bounds x="530" y="1010" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="587" y="1003" width="103" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_docstime_di" bpmnElement="A2_transit_docstime">
+        <dc:Bounds x="1420" y="852.5" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1338" y="923" width="124" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_transit_scanerr_di" bpmnElement="A2_transit_scanerr">
+        <dc:Bounds x="510" y="322.5" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="560" y="330.5" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_1_di" bpmnElement="A2_transit_Flow_1">
+        <di:waypoint x="400" y="140" />
+        <di:waypoint x="400" y="165" />
+        <di:waypoint x="400" y="275" />
+        <di:waypoint x="425" y="275" />
+        <di:waypoint x="425" y="300" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_2_di" bpmnElement="A2_transit_Flow_2">
+        <di:waypoint x="425" y="385" />
+        <di:waypoint x="425" y="410" />
+        <di:waypoint x="425" y="535" />
+        <di:waypoint x="420" y="535" />
+        <di:waypoint x="420" y="560" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_3_di" bpmnElement="A2_transit_Flow_3">
+        <di:waypoint x="550" y="342.5" />
+        <di:waypoint x="575" y="342.5" />
+        <di:waypoint x="765" y="342.5" />
+        <di:waypoint x="790" y="342.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_4_di" bpmnElement="A2_transit_Flow_4">
+        <di:waypoint x="790" y="342.5" />
+        <di:waypoint x="765" y="342.5" />
+        <di:waypoint x="765" y="590" />
+        <di:waypoint x="475" y="590" />
+        <di:waypoint x="450" y="590" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_5_di" bpmnElement="A2_transit_Flow_5">
+        <di:waypoint x="450" y="590" />
+        <di:waypoint x="475" y="590" />
+        <di:waypoint x="475" y="602.5" />
+        <di:waypoint x="765" y="602.5" />
+        <di:waypoint x="790" y="602.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="606" y="613" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_6_di" bpmnElement="A2_transit_Flow_6">
+        <di:waypoint x="450" y="590" />
+        <di:waypoint x="475" y="590" />
+        <di:waypoint x="475" y="538" />
+        <di:waypoint x="1205" y="538" />
+        <di:waypoint x="1205" y="602.5" />
+        <di:waypoint x="1230" y="602.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="596" y="520" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_7_di" bpmnElement="A2_transit_Flow_7">
+        <di:waypoint x="895" y="645" />
+        <di:waypoint x="895" y="670" />
+        <di:waypoint x="895" y="805" />
+        <di:waypoint x="890" y="805" />
+        <di:waypoint x="890" y="830" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_8_di" bpmnElement="A2_transit_Flow_8">
+        <di:waypoint x="920" y="860" />
+        <di:waypoint x="945" y="860" />
+        <di:waypoint x="945" y="1037.5" />
+        <di:waypoint x="1575" y="1037.5" />
+        <di:waypoint x="1575" y="1690" />
+        <di:waypoint x="1600" y="1690" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="959" y="953" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_9_di" bpmnElement="A2_transit_Flow_9">
+        <di:waypoint x="1335" y="645" />
+        <di:waypoint x="1335" y="670" />
+        <di:waypoint x="1335" y="805" />
+        <di:waypoint x="1335" y="830" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_10_di" bpmnElement="A2_transit_Flow_10">
+        <di:waypoint x="1440" y="892.5" />
+        <di:waypoint x="1440" y="917.5" />
+        <di:waypoint x="1620" y="917.5" />
+        <di:waypoint x="1620" y="1645" />
+        <di:waypoint x="1620" y="1670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_11_di" bpmnElement="A2_transit_Flow_11">
+        <di:waypoint x="420" y="620" />
+        <di:waypoint x="420" y="645" />
+        <di:waypoint x="420" y="955" />
+        <di:waypoint x="435" y="955" />
+        <di:waypoint x="435" y="980" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="386" y="693" width="27" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_12_di" bpmnElement="A2_transit_Flow_12">
+        <di:waypoint x="860" y="860" />
+        <di:waypoint x="835" y="860" />
+        <di:waypoint x="435" y="860" />
+        <di:waypoint x="435" y="955" />
+        <di:waypoint x="435" y="980" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="611" y="866" width="98" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_13_di" bpmnElement="A2_transit_Flow_13">
+        <di:waypoint x="435" y="1080" />
+        <di:waypoint x="435" y="1105" />
+        <di:waypoint x="435" y="1625" />
+        <di:waypoint x="410" y="1625" />
+        <di:waypoint x="410" y="1650" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_14_di" bpmnElement="A2_transit_Flow_14">
+        <di:waypoint x="570" y="1030" />
+        <di:waypoint x="595" y="1030" />
+        <di:waypoint x="595" y="1092.5" />
+        <di:waypoint x="765" y="1092.5" />
+        <di:waypoint x="790" y="1092.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_15_di" bpmnElement="A2_transit_Flow_15">
+        <di:waypoint x="895" y="1135" />
+        <di:waypoint x="895" y="1160" />
+        <di:waypoint x="895" y="1325" />
+        <di:waypoint x="890" y="1325" />
+        <di:waypoint x="890" y="1350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_16_di" bpmnElement="A2_transit_Flow_16">
+        <di:waypoint x="860" y="1380" />
+        <di:waypoint x="835" y="1380" />
+        <di:waypoint x="835" y="1670" />
+        <di:waypoint x="455" y="1670" />
+        <di:waypoint x="430" y="1670" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="801" y="1473" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_17_di" bpmnElement="A2_transit_Flow_17">
+        <di:waypoint x="920" y="1380" />
+        <di:waypoint x="945" y="1380" />
+        <di:waypoint x="945" y="1690" />
+        <di:waypoint x="1195" y="1690" />
+        <di:waypoint x="1220" y="1690" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="952" y="1473" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_18_di" bpmnElement="A2_transit_Flow_18">
+        <di:waypoint x="1000" y="1112.5" />
+        <di:waypoint x="1000" y="1137.5" />
+        <di:waypoint x="1000" y="1645" />
+        <di:waypoint x="1240" y="1645" />
+        <di:waypoint x="1240" y="1670" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_19_di" bpmnElement="A2_transit_Flow_19">
+        <di:waypoint x="1335" y="915" />
+        <di:waypoint x="1335" y="940" />
+        <di:waypoint x="1335" y="1075" />
+        <di:waypoint x="1335" y="1100" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_20_di" bpmnElement="A2_transit_Flow_20">
+        <di:waypoint x="1335" y="1185" />
+        <di:waypoint x="1335" y="1210" />
+        <di:waypoint x="1335" y="1345" />
+        <di:waypoint x="1330" y="1345" />
+        <di:waypoint x="1330" y="1370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_21_di" bpmnElement="A2_transit_Flow_21">
+        <di:waypoint x="1300" y="1400" />
+        <di:waypoint x="1275" y="1400" />
+        <di:waypoint x="1275" y="1207" />
+        <di:waypoint x="295" y="1207" />
+        <di:waypoint x="295" y="1030" />
+        <di:waypoint x="320" y="1030" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1230" y="1303" width="54" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_22_di" bpmnElement="A2_transit_Flow_22">
+        <di:waypoint x="1360" y="1400" />
+        <di:waypoint x="1385" y="1400" />
+        <di:waypoint x="1475" y="1400" />
+        <di:waypoint x="1475" y="602.5" />
+        <di:waypoint x="1465" y="602.5" />
+        <di:waypoint x="1440" y="602.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1393" y="1383" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_transit_Flow_23_di" bpmnElement="A2_transit_Flow_23">
+        <di:waypoint x="1360" y="1400" />
+        <di:waypoint x="1385" y="1400" />
+        <di:waypoint x="1385" y="1690" />
+        <di:waypoint x="1575" y="1690" />
+        <di:waypoint x="1600" y="1690" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1394" y="1463" width="52" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="A2_Diagram_delivery">
+    <bpmndi:BPMNPlane id="A2_Plane_delivery" bpmnElement="A2_delivery">
+      <bpmndi:BPMNShape id="A2_delivery_d0_di" bpmnElement="A2_delivery_d0">
+        <dc:Bounds x="380" y="100" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="355" y="150" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_notify_di" bpmnElement="A2_delivery_notify">
+        <dc:Bounds x="320" y="290" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_result_di" bpmnElement="A2_delivery_result" isMarkerVisible="true">
+        <dc:Bounds x="390" y="760" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="315" y="783" width="70" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_evidence_di" bpmnElement="A2_delivery_evidence">
+        <dc:Bounds x="320" y="1510" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_ddone_di" bpmnElement="A2_delivery_ddone">
+        <dc:Bounds x="390" y="1770" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="357.8" y="1820" width="104.4" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_address_di" bpmnElement="A2_delivery_address">
+        <dc:Bounds x="800" y="760" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_wait_di" bpmnElement="A2_delivery_wait">
+        <dc:Bounds x="860" y="1460" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="827.8" y="1510" width="104.4" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_attempts_di" bpmnElement="A2_delivery_attempts" isMarkerVisible="true">
+        <dc:Bounds x="800" y="1210" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="692" y="1253" width="116" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_hold_di" bpmnElement="A2_delivery_hold">
+        <dc:Bounds x="1230" y="1200" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_identity_di" bpmnElement="A2_delivery_identity">
+        <dc:Bounds x="1230" y="1470" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_returnerror_di" bpmnElement="A2_delivery_returnerror">
+        <dc:Bounds x="1660" y="1780" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1633.6" y="1830" width="92.8" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_damage_di" bpmnElement="A2_delivery_damage">
+        <dc:Bounds x="1230" y="760" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_damagechoice_di" bpmnElement="A2_delivery_damagechoice" isMarkerVisible="true">
+        <dc:Bounds x="1300" y="990" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1208" y="1043" width="109" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_replace_di" bpmnElement="A2_delivery_replace">
+        <dc:Bounds x="1660" y="1190" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_surcharge_di" bpmnElement="A2_delivery_surcharge" isMarkerVisible="true">
+        <dc:Bounds x="870" y="990" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="759" y="1058" width="123" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_handover_di" bpmnElement="A2_delivery_handover">
+        <dc:Bounds x="320" y="507" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_delivery_holdtime_di" bpmnElement="A2_delivery_holdtime">
+        <dc:Bounds x="1420" y="1222.5" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1470" y="1230.5" width="104.4" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_1_di" bpmnElement="A2_delivery_Flow_1">
+        <di:waypoint x="400" y="140" />
+        <di:waypoint x="400" y="165" />
+        <di:waypoint x="400" y="265" />
+        <di:waypoint x="425" y="265" />
+        <di:waypoint x="425" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_2_di" bpmnElement="A2_delivery_Flow_2">
+        <di:waypoint x="425" y="375" />
+        <di:waypoint x="425" y="507" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_3_di" bpmnElement="A2_delivery_Flow_3">
+        <di:waypoint x="425" y="592" />
+        <di:waypoint x="425" y="676" />
+        <di:waypoint x="420" y="676" />
+        <di:waypoint x="420" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_4_di" bpmnElement="A2_delivery_Flow_4">
+        <di:waypoint x="420" y="820" />
+        <di:waypoint x="420" y="845" />
+        <di:waypoint x="420" y="1485" />
+        <di:waypoint x="425" y="1485" />
+        <di:waypoint x="425" y="1510" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="412" y="832.5" width="64" height="25" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_5_di" bpmnElement="A2_delivery_Flow_5">
+        <di:waypoint x="450" y="790" />
+        <di:waypoint x="475" y="790" />
+        <di:waypoint x="475" y="802.5" />
+        <di:waypoint x="775" y="802.5" />
+        <di:waypoint x="800" y="802.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="482" y="783" width="75" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_6_di" bpmnElement="A2_delivery_Flow_6">
+        <di:waypoint x="450" y="790" />
+        <di:waypoint x="475" y="790" />
+        <di:waypoint x="475" y="1240" />
+        <di:waypoint x="775" y="1240" />
+        <di:waypoint x="800" y="1240" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="481" y="893" width="58" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_7_di" bpmnElement="A2_delivery_Flow_7">
+        <di:waypoint x="830" y="1270" />
+        <di:waypoint x="830" y="1295" />
+        <di:waypoint x="830" y="1435" />
+        <di:waypoint x="880" y="1435" />
+        <di:waypoint x="880" y="1460" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="822" y="1282.5" width="64" height="25" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_8_di" bpmnElement="A2_delivery_Flow_8">
+        <di:waypoint x="860" y="1480" />
+        <di:waypoint x="295" y="1480" />
+        <di:waypoint x="295" y="550" />
+        <di:waypoint x="320" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_9_di" bpmnElement="A2_delivery_Flow_9">
+        <di:waypoint x="860" y="1240" />
+        <di:waypoint x="885" y="1240" />
+        <di:waypoint x="885" y="1242.5" />
+        <di:waypoint x="1205" y="1242.5" />
+        <di:waypoint x="1230" y="1242.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="872" y="1226" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_10_di" bpmnElement="A2_delivery_Flow_10">
+        <di:waypoint x="1335" y="1285" />
+        <di:waypoint x="1335" y="1310" />
+        <di:waypoint x="1335" y="1445" />
+        <di:waypoint x="1335" y="1470" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_11_di" bpmnElement="A2_delivery_Flow_11">
+        <di:waypoint x="1230" y="1512.5" />
+        <di:waypoint x="1205" y="1512.5" />
+        <di:waypoint x="1205" y="1552.5" />
+        <di:waypoint x="555" y="1552.5" />
+        <di:waypoint x="530" y="1552.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_12_di" bpmnElement="A2_delivery_Flow_12">
+        <di:waypoint x="425" y="1595" />
+        <di:waypoint x="425" y="1620" />
+        <di:waypoint x="425" y="1745" />
+        <di:waypoint x="410" y="1745" />
+        <di:waypoint x="410" y="1770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_13_di" bpmnElement="A2_delivery_Flow_13">
+        <di:waypoint x="450" y="790" />
+        <di:waypoint x="475" y="790" />
+        <di:waypoint x="475" y="867" />
+        <di:waypoint x="1635" y="867" />
+        <di:waypoint x="1635" y="1800" />
+        <di:waypoint x="1660" y="1800" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="484" y="843" width="111" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_14_di" bpmnElement="A2_delivery_Flow_14">
+        <di:waypoint x="1440" y="1263" />
+        <di:waypoint x="1440" y="1288" />
+        <di:waypoint x="1680" y="1287.5" />
+        <di:waypoint x="1680" y="1780" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_15_di" bpmnElement="A2_delivery_Flow_15">
+        <di:waypoint x="450" y="790" />
+        <di:waypoint x="475" y="790" />
+        <di:waypoint x="475" y="738" />
+        <di:waypoint x="1205" y="738" />
+        <di:waypoint x="1205" y="802.5" />
+        <di:waypoint x="1230" y="802.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="536" y="720" width="48" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_16_di" bpmnElement="A2_delivery_Flow_16">
+        <di:waypoint x="1335" y="845" />
+        <di:waypoint x="1335" y="870" />
+        <di:waypoint x="1335" y="965" />
+        <di:waypoint x="1330" y="965" />
+        <di:waypoint x="1330" y="990" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_17_di" bpmnElement="A2_delivery_Flow_17">
+        <di:waypoint x="1360" y="1020" />
+        <di:waypoint x="1385" y="1020" />
+        <di:waypoint x="1625" y="1020" />
+        <di:waypoint x="1625" y="1232.5" />
+        <di:waypoint x="1635" y="1232.5" />
+        <di:waypoint x="1660" y="1232.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1361" y="1003" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_18_di" bpmnElement="A2_delivery_Flow_18">
+        <di:waypoint x="1660" y="1233" />
+        <di:waypoint x="1638" y="1232.5" />
+        <di:waypoint x="1638" y="550" />
+        <di:waypoint x="530" y="550" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_19_di" bpmnElement="A2_delivery_Flow_19">
+        <di:waypoint x="1330" y="1050" />
+        <di:waypoint x="1330" y="1075" />
+        <di:waypoint x="1495" y="1075" />
+        <di:waypoint x="1495" y="1755" />
+        <di:waypoint x="1680" y="1755" />
+        <di:waypoint x="1680" y="1780" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1322" y="1062.5" width="64" height="25" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_20_di" bpmnElement="A2_delivery_Flow_20">
+        <di:waypoint x="905" y="845" />
+        <di:waypoint x="905" y="870" />
+        <di:waypoint x="905" y="965" />
+        <di:waypoint x="900" y="965" />
+        <di:waypoint x="900" y="990" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_21_di" bpmnElement="A2_delivery_Flow_21">
+        <di:waypoint x="870" y="1020" />
+        <di:waypoint x="285" y="1020" />
+        <di:waypoint x="285" y="552.5" />
+        <di:waypoint x="295" y="550" />
+        <di:waypoint x="320" y="550" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="831" y="1003" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_delivery_Flow_22_di" bpmnElement="A2_delivery_Flow_22">
+        <di:waypoint x="930" y="1020" />
+        <di:waypoint x="955" y="1020" />
+        <di:waypoint x="955" y="1800" />
+        <di:waypoint x="1635" y="1800" />
+        <di:waypoint x="1660" y="1800" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="932" y="1003" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="A2_Diagram_movement">
+    <bpmndi:BPMNPlane id="A2_Plane_movement" bpmnElement="A2_movement">
+      <bpmndi:BPMNShape id="A2_movement_m0_di" bpmnElement="A2_movement_m0">
+        <dc:Bounds x="380" y="100" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="347.8" y="150" width="104.4" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_movement_move_di" bpmnElement="A2_movement_move">
+        <dc:Bounds x="320" y="290" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_movement_event_di" bpmnElement="A2_movement_event">
+        <dc:Bounds x="390" y="540" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="320" y="598" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_movement_arrival_di" bpmnElement="A2_movement_arrival">
+        <dc:Bounds x="390" y="800" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="337.5" y="850" width="145" height="32" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_movement_delay_di" bpmnElement="A2_movement_delay">
+        <dc:Bounds x="850" y="590" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="806.2" y="640" width="127.6" height="32" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_movement_eta_di" bpmnElement="A2_movement_eta">
+        <dc:Bounds x="1230" y="590" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1205" y="640" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_movement_reroute_di" bpmnElement="A2_movement_reroute">
+        <dc:Bounds x="850" y="850" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A2_movement_mdone_di" bpmnElement="A2_movement_mdone">
+        <dc:Bounds x="390" y="1090" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="360.7" y="1140" width="98.6" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A2_movement_Flow_1_di" bpmnElement="A2_movement_Flow_1">
+        <di:waypoint x="400" y="140" />
+        <di:waypoint x="400" y="165" />
+        <di:waypoint x="400" y="265" />
+        <di:waypoint x="425" y="265" />
+        <di:waypoint x="425" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_movement_Flow_2_di" bpmnElement="A2_movement_Flow_2">
+        <di:waypoint x="425" y="375" />
+        <di:waypoint x="425" y="400" />
+        <di:waypoint x="425" y="515" />
+        <di:waypoint x="420" y="515" />
+        <di:waypoint x="420" y="540" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_movement_Flow_3_di" bpmnElement="A2_movement_Flow_3">
+        <di:waypoint x="420" y="600" />
+        <di:waypoint x="420" y="625" />
+        <di:waypoint x="420" y="775" />
+        <di:waypoint x="410" y="775" />
+        <di:waypoint x="410" y="800" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_movement_Flow_4_di" bpmnElement="A2_movement_Flow_4">
+        <di:waypoint x="450" y="570" />
+        <di:waypoint x="475" y="570" />
+        <di:waypoint x="475" y="610" />
+        <di:waypoint x="825" y="610" />
+        <di:waypoint x="850" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_movement_Flow_5_di" bpmnElement="A2_movement_Flow_5">
+        <di:waypoint x="450" y="570" />
+        <di:waypoint x="475" y="570" />
+        <di:waypoint x="1205" y="570" />
+        <di:waypoint x="1205" y="610" />
+        <di:waypoint x="1230" y="610" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_movement_Flow_6_di" bpmnElement="A2_movement_Flow_6">
+        <di:waypoint x="410" y="840" />
+        <di:waypoint x="410" y="865" />
+        <di:waypoint x="410" y="1065" />
+        <di:waypoint x="410" y="1090" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_movement_Flow_7_di" bpmnElement="A2_movement_Flow_7">
+        <di:waypoint x="870" y="630" />
+        <di:waypoint x="870" y="655" />
+        <di:waypoint x="870" y="825" />
+        <di:waypoint x="955" y="825" />
+        <di:waypoint x="955" y="850" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_movement_Flow_8_di" bpmnElement="A2_movement_Flow_8">
+        <di:waypoint x="1230" y="610" />
+        <di:waypoint x="1205" y="610" />
+        <di:waypoint x="1205" y="892.5" />
+        <di:waypoint x="1085" y="892.5" />
+        <di:waypoint x="1060" y="892.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A2_movement_Flow_9_di" bpmnElement="A2_movement_Flow_9">
+        <di:waypoint x="850" y="892.5" />
+        <di:waypoint x="825" y="892.5" />
+        <di:waypoint x="365" y="892.5" />
+        <di:waypoint x="365" y="570" />
+        <di:waypoint x="390" y="570" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

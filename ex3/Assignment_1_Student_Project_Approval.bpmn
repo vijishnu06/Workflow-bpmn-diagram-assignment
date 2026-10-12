@@ -1,0 +1,1530 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:ns1="http://camunda.org/schema/modeler/1.0" id="A1_Definitions" targetNamespace="https://example.org/bpmn/assignments" exporter="Camunda Modeler" exporterVersion="5.49.0" ns1:executionPlatform="Camunda Cloud" ns1:executionPlatformVersion="8.8.0">
+  <bpmn:process id="A1_Student_Project" name="Student Project Approval and Allocation" isExecutable="false">
+    <bpmn:laneSet id="A1_Lanes">
+      <bpmn:lane id="A1_MainLane" name="Project department">
+        <bpmn:flowNodeRef>A1_Student_Project_s</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_done</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_proposal</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_review</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_allocation</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_noguide</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_pc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_rc</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_withdraw</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="A1_SupportLane" name="Coordinator / support">
+        <bpmn:flowNodeRef>A1_Student_Project_newlimit</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_newtopic</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_release</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_wg</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_withdrawn</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_newchoice</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_closed</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>A1_Student_Project_noguideend</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="A1_Student_Project_s" name="Proposal started">
+      <bpmn:outgoing>A1_Student_Project_Flow_1</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:exclusiveGateway id="A1_Student_Project_newlimit" name="New topic already used?">
+      <bpmn:incoming>A1_Student_Project_Flow_10</bpmn:incoming>
+      <bpmn:outgoing>A1_Student_Project_Flow_11</bpmn:outgoing>
+      <bpmn:outgoing>A1_Student_Project_Flow_12</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="A1_Student_Project_newtopic" name="Consider and record one new topic">
+      <bpmn:incoming>A1_Student_Project_Flow_12</bpmn:incoming>
+      <bpmn:outgoing>A1_Student_Project_Flow_13</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="A1_Student_Project_done" name="Project allocated">
+      <bpmn:incoming>A1_Student_Project_Flow_4</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="A1_Student_Project_release" name="Release guide reservation">
+      <bpmn:incoming>A1_Student_Project_Flow_6</bpmn:incoming>
+      <bpmn:outgoing>A1_Student_Project_Flow_7</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="A1_Student_Project_wg" name="Team continuing?">
+      <bpmn:incoming>A1_Student_Project_Flow_7</bpmn:incoming>
+      <bpmn:outgoing>A1_Student_Project_Flow_8</bpmn:outgoing>
+      <bpmn:outgoing>A1_Student_Project_Flow_9</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="A1_Student_Project_withdrawn" name="Team withdrawn">
+      <bpmn:incoming>A1_Student_Project_Flow_9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="A1_Student_Project_newchoice" name="Submit new topic?">
+      <bpmn:incoming>A1_Student_Project_Flow_13</bpmn:incoming>
+      <bpmn:outgoing>A1_Student_Project_Flow_14</bpmn:outgoing>
+      <bpmn:outgoing>A1_Student_Project_Flow_15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:endEvent id="A1_Student_Project_closed" name="Proposal closed">
+      <bpmn:incoming>A1_Student_Project_Flow_5</bpmn:incoming>
+      <bpmn:incoming>A1_Student_Project_Flow_11</bpmn:incoming>
+      <bpmn:incoming>A1_Student_Project_Flow_15</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:subProcess id="A1_proposal" name="Submit and check proposal">
+      <bpmn:incoming>A1_Student_Project_Flow_1</bpmn:incoming>
+      <bpmn:incoming>A1_Student_Project_Flow_14</bpmn:incoming>
+      <bpmn:outgoing>A1_Student_Project_Flow_2</bpmn:outgoing>
+      <bpmn:startEvent id="A1_proposal_p0" name="Start">
+        <bpmn:outgoing>A1_proposal_Flow_1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:userTask id="A1_proposal_submit" name="Student submits proposal">
+        <bpmn:incoming>A1_proposal_Flow_1</bpmn:incoming>
+        <bpmn:incoming>A1_proposal_Flow_6</bpmn:incoming>
+        <bpmn:incoming>A1_proposal_Flow_15</bpmn:incoming>
+        <bpmn:incoming>A1_proposal_Flow_18</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_2</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:serviceTask id="A1_proposal_validate" name="Validate fields and team rules">
+        <bpmn:incoming>A1_proposal_Flow_2</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_3</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="A1_proposal_valid" name="Details valid?">
+        <bpmn:incoming>A1_proposal_Flow_3</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_4</bpmn:outgoing>
+        <bpmn:outgoing>A1_proposal_Flow_5</bpmn:outgoing>
+        <bpmn:outgoing>A1_proposal_Flow_7</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:userTask id="A1_proposal_screen" name="Coordinator checks scope and resources">
+        <bpmn:incoming>A1_proposal_Flow_4</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_20</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:serviceTask id="A1_proposal_similar" name="Check topic similarity">
+        <bpmn:incoming>A1_proposal_Flow_21</bpmn:incoming>
+        <bpmn:incoming>A1_proposal_Flow_24</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_8</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="A1_proposal_match" name="Similar topic?">
+        <bpmn:incoming>A1_proposal_Flow_8</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_9</bpmn:outgoing>
+        <bpmn:outgoing>A1_proposal_Flow_10</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:endEvent id="A1_proposal_pdone" name="Ready for review">
+        <bpmn:incoming>A1_proposal_Flow_9</bpmn:incoming>
+        <bpmn:incoming>A1_proposal_Flow_12</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:userTask id="A1_proposal_correct" name="Correct details with coordinator">
+        <bpmn:documentation>Coordinator reviews repeated errors with the student and permits resubmission only when corrected; close an invalid team through the validation result.</bpmn:documentation>
+        <bpmn:incoming>A1_proposal_Flow_5</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_6</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:endEvent id="A1_proposal_invalid" name="Invalid team: close proposal">
+        <bpmn:incoming>A1_proposal_Flow_7</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="A1_error_CLOSED" />
+      </bpmn:endEvent>
+      <bpmn:userTask id="A1_proposal_topic" name="Coordinator reviews topic match">
+        <bpmn:incoming>A1_proposal_Flow_10</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_11</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A1_proposal_tg" name="Topic acceptable?">
+        <bpmn:incoming>A1_proposal_Flow_11</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_12</bpmn:outgoing>
+        <bpmn:outgoing>A1_proposal_Flow_13</bpmn:outgoing>
+        <bpmn:outgoing>A1_proposal_Flow_14</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:userTask id="A1_proposal_topicchange" name="Student changes topic">
+        <bpmn:incoming>A1_proposal_Flow_13</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_15</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:endEvent id="A1_proposal_preject" name="Proposal cannot proceed">
+        <bpmn:incoming>A1_proposal_Flow_14</bpmn:incoming>
+        <bpmn:incoming>A1_proposal_Flow_19</bpmn:incoming>
+        <bpmn:incoming>A1_proposal_Flow_25</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="A1_error_CLOSED" />
+      </bpmn:endEvent>
+      <bpmn:boundaryEvent id="A1_proposal_late" name="7-day submission deadline" attachedToRef="A1_proposal_submit">
+        <bpmn:outgoing>A1_proposal_Flow_16</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P7D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:userTask id="A1_proposal_latecheck" name="Coordinator decides late request">
+        <bpmn:incoming>A1_proposal_Flow_16</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_17</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A1_proposal_lg" name="Late request approved?">
+        <bpmn:incoming>A1_proposal_Flow_17</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_18</bpmn:outgoing>
+        <bpmn:outgoing>A1_proposal_Flow_19</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:exclusiveGateway id="A1_proposal_resources" name="Resources available?">
+        <bpmn:incoming>A1_proposal_Flow_20</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_21</bpmn:outgoing>
+        <bpmn:outgoing>A1_proposal_Flow_22</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:userTask id="A1_proposal_adapt" name="Agree adjusted scope and resources">
+        <bpmn:incoming>A1_proposal_Flow_22</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_23</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A1_proposal_feasible" name="Adjusted plan feasible?">
+        <bpmn:incoming>A1_proposal_Flow_23</bpmn:incoming>
+        <bpmn:outgoing>A1_proposal_Flow_24</bpmn:outgoing>
+        <bpmn:outgoing>A1_proposal_Flow_25</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="A1_proposal_Flow_1" sourceRef="A1_proposal_p0" targetRef="A1_proposal_submit" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_2" sourceRef="A1_proposal_submit" targetRef="A1_proposal_validate" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_3" sourceRef="A1_proposal_validate" targetRef="A1_proposal_valid" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_4" name="Valid" sourceRef="A1_proposal_valid" targetRef="A1_proposal_screen" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_5" name="Missing details" sourceRef="A1_proposal_valid" targetRef="A1_proposal_correct" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_6" sourceRef="A1_proposal_correct" targetRef="A1_proposal_submit" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_7" name="Invalid team" sourceRef="A1_proposal_valid" targetRef="A1_proposal_invalid" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_8" sourceRef="A1_proposal_similar" targetRef="A1_proposal_match" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_9" name="No" sourceRef="A1_proposal_match" targetRef="A1_proposal_pdone" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_10" name="Yes" sourceRef="A1_proposal_match" targetRef="A1_proposal_topic" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_11" sourceRef="A1_proposal_topic" targetRef="A1_proposal_tg" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_12" name="Accept" sourceRef="A1_proposal_tg" targetRef="A1_proposal_pdone" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_13" name="Change topic" sourceRef="A1_proposal_tg" targetRef="A1_proposal_topicchange" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_14" name="Reject" sourceRef="A1_proposal_tg" targetRef="A1_proposal_preject" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_15" sourceRef="A1_proposal_topicchange" targetRef="A1_proposal_submit" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_16" sourceRef="A1_proposal_late" targetRef="A1_proposal_latecheck" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_17" sourceRef="A1_proposal_latecheck" targetRef="A1_proposal_lg" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_18" name="Yes" sourceRef="A1_proposal_lg" targetRef="A1_proposal_submit" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_19" name="No" sourceRef="A1_proposal_lg" targetRef="A1_proposal_preject" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_20" sourceRef="A1_proposal_screen" targetRef="A1_proposal_resources" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_21" name="Yes" sourceRef="A1_proposal_resources" targetRef="A1_proposal_similar" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_22" name="Need adjustment" sourceRef="A1_proposal_resources" targetRef="A1_proposal_adapt" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_23" sourceRef="A1_proposal_adapt" targetRef="A1_proposal_feasible" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_24" name="Yes" sourceRef="A1_proposal_feasible" targetRef="A1_proposal_similar" />
+      <bpmn:sequenceFlow id="A1_proposal_Flow_25" name="No" sourceRef="A1_proposal_feasible" targetRef="A1_proposal_preject" />
+    </bpmn:subProcess>
+    <bpmn:subProcess id="A1_review" name="Review proposal">
+      <bpmn:incoming>A1_Student_Project_Flow_2</bpmn:incoming>
+      <bpmn:outgoing>A1_Student_Project_Flow_3</bpmn:outgoing>
+      <bpmn:startEvent id="A1_review_r0" name="Start">
+        <bpmn:outgoing>A1_review_Flow_1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:userTask id="A1_review_evaluate" name="Committee evaluates proposal">
+        <bpmn:incoming>A1_review_Flow_1</bpmn:incoming>
+        <bpmn:incoming>A1_review_Flow_7</bpmn:incoming>
+        <bpmn:outgoing>A1_review_Flow_2</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A1_review_decision" name="Committee decision">
+        <bpmn:incoming>A1_review_Flow_2</bpmn:incoming>
+        <bpmn:outgoing>A1_review_Flow_3</bpmn:outgoing>
+        <bpmn:outgoing>A1_review_Flow_4</bpmn:outgoing>
+        <bpmn:outgoing>A1_review_Flow_5</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:endEvent id="A1_review_rdone" name="Approved">
+        <bpmn:incoming>A1_review_Flow_3</bpmn:incoming>
+        <bpmn:incoming>A1_review_Flow_10</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:exclusiveGateway id="A1_review_revlimit" name="Fewer than 2 revisions?">
+        <bpmn:incoming>A1_review_Flow_4</bpmn:incoming>
+        <bpmn:outgoing>A1_review_Flow_6</bpmn:outgoing>
+        <bpmn:outgoing>A1_review_Flow_8</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:userTask id="A1_review_revise" name="Student revises with coordinator">
+        <bpmn:documentation>Record the completed revision cycle. A maximum of two revision cycles is allowed.</bpmn:documentation>
+        <bpmn:incoming>A1_review_Flow_6</bpmn:incoming>
+        <bpmn:outgoing>A1_review_Flow_7</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:userTask id="A1_review_finalreview" name="Committee makes final decision">
+        <bpmn:incoming>A1_review_Flow_8</bpmn:incoming>
+        <bpmn:outgoing>A1_review_Flow_9</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A1_review_fg" name="Final approval?">
+        <bpmn:incoming>A1_review_Flow_9</bpmn:incoming>
+        <bpmn:outgoing>A1_review_Flow_10</bpmn:outgoing>
+        <bpmn:outgoing>A1_review_Flow_11</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sendTask id="A1_review_reasons" name="Send rejection or expiry reasons">
+        <bpmn:incoming>A1_review_Flow_5</bpmn:incoming>
+        <bpmn:incoming>A1_review_Flow_11</bpmn:incoming>
+        <bpmn:incoming>A1_review_Flow_12</bpmn:incoming>
+        <bpmn:outgoing>A1_review_Flow_13</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:endEvent id="A1_review_rclosed" name="Review closed">
+        <bpmn:incoming>A1_review_Flow_13</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="A1_error_CLOSED" />
+      </bpmn:endEvent>
+      <bpmn:boundaryEvent id="A1_review_revisiontime" name="7-day revision deadline" attachedToRef="A1_review_revise">
+        <bpmn:outgoing>A1_review_Flow_12</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P7D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:boundaryEvent id="A1_review_remind" name="Review pending for 2 days" cancelActivity="false" attachedToRef="A1_review_evaluate">
+        <bpmn:outgoing>A1_review_Flow_14</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P2D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:sendTask id="A1_review_notice" name="Send committee reminder">
+        <bpmn:incoming>A1_review_Flow_14</bpmn:incoming>
+        <bpmn:outgoing>A1_review_Flow_15</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:endEvent id="A1_review_remend" name="Reminder sent">
+        <bpmn:incoming>A1_review_Flow_15</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:boundaryEvent id="A1_review_hodtimer" name="Review pending for 4 days" cancelActivity="false" attachedToRef="A1_review_evaluate">
+        <bpmn:outgoing>A1_review_Flow_16</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P4D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:sendTask id="A1_review_hodnotice" name="Escalate delayed review to HoD">
+        <bpmn:incoming>A1_review_Flow_16</bpmn:incoming>
+        <bpmn:outgoing>A1_review_Flow_17</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:endEvent id="A1_review_hodend" name="HoD informed">
+        <bpmn:incoming>A1_review_Flow_17</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="A1_review_Flow_1" sourceRef="A1_review_r0" targetRef="A1_review_evaluate" />
+      <bpmn:sequenceFlow id="A1_review_Flow_2" sourceRef="A1_review_evaluate" targetRef="A1_review_decision" />
+      <bpmn:sequenceFlow id="A1_review_Flow_3" name="Approve" sourceRef="A1_review_decision" targetRef="A1_review_rdone" />
+      <bpmn:sequenceFlow id="A1_review_Flow_4" name="Revise" sourceRef="A1_review_decision" targetRef="A1_review_revlimit" />
+      <bpmn:sequenceFlow id="A1_review_Flow_5" name="Reject" sourceRef="A1_review_decision" targetRef="A1_review_reasons" />
+      <bpmn:sequenceFlow id="A1_review_Flow_6" name="Yes" sourceRef="A1_review_revlimit" targetRef="A1_review_revise" />
+      <bpmn:sequenceFlow id="A1_review_Flow_7" sourceRef="A1_review_revise" targetRef="A1_review_evaluate" />
+      <bpmn:sequenceFlow id="A1_review_Flow_8" name="No" sourceRef="A1_review_revlimit" targetRef="A1_review_finalreview" />
+      <bpmn:sequenceFlow id="A1_review_Flow_9" sourceRef="A1_review_finalreview" targetRef="A1_review_fg" />
+      <bpmn:sequenceFlow id="A1_review_Flow_10" name="Yes" sourceRef="A1_review_fg" targetRef="A1_review_rdone" />
+      <bpmn:sequenceFlow id="A1_review_Flow_11" name="No" sourceRef="A1_review_fg" targetRef="A1_review_reasons" />
+      <bpmn:sequenceFlow id="A1_review_Flow_12" sourceRef="A1_review_revisiontime" targetRef="A1_review_reasons" />
+      <bpmn:sequenceFlow id="A1_review_Flow_13" sourceRef="A1_review_reasons" targetRef="A1_review_rclosed" />
+      <bpmn:sequenceFlow id="A1_review_Flow_14" sourceRef="A1_review_remind" targetRef="A1_review_notice" />
+      <bpmn:sequenceFlow id="A1_review_Flow_15" sourceRef="A1_review_notice" targetRef="A1_review_remend" />
+      <bpmn:sequenceFlow id="A1_review_Flow_16" sourceRef="A1_review_hodtimer" targetRef="A1_review_hodnotice" />
+      <bpmn:sequenceFlow id="A1_review_Flow_17" sourceRef="A1_review_hodnotice" targetRef="A1_review_hodend" />
+    </bpmn:subProcess>
+    <bpmn:subProcess id="A1_allocation" name="Allocate guide">
+      <bpmn:incoming>A1_Student_Project_Flow_3</bpmn:incoming>
+      <bpmn:incoming>A1_Student_Project_Flow_8</bpmn:incoming>
+      <bpmn:outgoing>A1_Student_Project_Flow_4</bpmn:outgoing>
+      <bpmn:startEvent id="A1_allocation_a0" name="Start">
+        <bpmn:outgoing>A1_allocation_Flow_1</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:businessRuleTask id="A1_allocation_rule" name="Match guide domain and workload">
+        <bpmn:incoming>A1_allocation_Flow_1</bpmn:incoming>
+        <bpmn:incoming>A1_allocation_Flow_21</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_2</bpmn:outgoing>
+      </bpmn:businessRuleTask>
+      <bpmn:exclusiveGateway id="A1_allocation_available" name="Guide available?">
+        <bpmn:incoming>A1_allocation_Flow_2</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_3</bpmn:outgoing>
+        <bpmn:outgoing>A1_allocation_Flow_4</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="A1_allocation_reserve" name="Reserve guide slot">
+        <bpmn:incoming>A1_allocation_Flow_3</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_5</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sendTask id="A1_allocation_request" name="Send guide request">
+        <bpmn:incoming>A1_allocation_Flow_5</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_6</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:userTask id="A1_allocation_accept" name="Guide responds to request">
+        <bpmn:incoming>A1_allocation_Flow_6</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_7</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A1_allocation_ag" name="Guide accepts?">
+        <bpmn:incoming>A1_allocation_Flow_7</bpmn:incoming>
+        <bpmn:incoming>A1_allocation_replacement_yes</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_14</bpmn:outgoing>
+        <bpmn:outgoing>A1_allocation_Flow_18</bpmn:outgoing>
+        <bpmn:outgoing>Flow_02zgi32</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:serviceTask id="A1_allocation_record" name="Record accepted allocation">
+        <bpmn:documentation>Store the confirmed guide assignment. A recording error is handled manually.</bpmn:documentation>
+        <bpmn:incoming>A1_allocation_Flow_16</bpmn:incoming>
+        <bpmn:incoming>Flow_02zgi32</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_10</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sendTask id="A1_allocation_notify" name="Notify student and guide">
+        <bpmn:incoming>A1_allocation_Flow_10</bpmn:incoming>
+        <bpmn:incoming>A1_allocation_Flow_13</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_11</bpmn:outgoing>
+      </bpmn:sendTask>
+      <bpmn:endEvent id="A1_allocation_adone" name="Allocation confirmed">
+        <bpmn:incoming>A1_allocation_Flow_11</bpmn:incoming>
+        <bpmn:incoming>A1_allocation_Flow_24</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:userTask id="A1_allocation_manual" name="Coordinator confirms willing replacement guide">
+        <bpmn:documentation>Coordinator checks willingness and capacity, releases any earlier reservation and confirms the replacement guide before completing this task.</bpmn:documentation>
+        <bpmn:incoming>A1_allocation_Flow_4</bpmn:incoming>
+        <bpmn:incoming>A1_allocation_Flow_22</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_9</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:boundaryEvent id="A1_allocation_silent" name="No reply in 3 days" attachedToRef="A1_allocation_accept">
+        <bpmn:outgoing>A1_allocation_Flow_19</bpmn:outgoing>
+        <bpmn:timerEventDefinition>
+          <bpmn:timeDuration>P3D</bpmn:timeDuration>
+        </bpmn:timerEventDefinition>
+      </bpmn:boundaryEvent>
+      <bpmn:boundaryEvent id="A1_allocation_systemfail" name="Recording failed" attachedToRef="A1_allocation_record">
+        <bpmn:outgoing>A1_allocation_Flow_12</bpmn:outgoing>
+        <bpmn:errorEventDefinition errorRef="A1_error_SYSTEM" />
+      </bpmn:boundaryEvent>
+      <bpmn:userTask id="A1_allocation_repair" name="Coordinator records allocation manually">
+        <bpmn:incoming>A1_allocation_Flow_12</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_13</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:userTask id="A1_allocation_terms" name="Discuss guide conditions with team">
+        <bpmn:incoming>A1_allocation_Flow_14</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_15</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:exclusiveGateway id="A1_allocation_termsok" name="Conditions agreed?">
+        <bpmn:incoming>A1_allocation_Flow_15</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_16</bpmn:outgoing>
+        <bpmn:outgoing>A1_allocation_Flow_17</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:boundaryEvent id="A1_allocation_notifyfail" name="Notification failed" attachedToRef="A1_allocation_notify">
+        <bpmn:outgoing>A1_allocation_Flow_23</bpmn:outgoing>
+        <bpmn:errorEventDefinition errorRef="A1_error_SYSTEM" />
+      </bpmn:boundaryEvent>
+      <bpmn:userTask id="A1_allocation_manualnotify" name="Coordinator confirms notification manually">
+        <bpmn:incoming>A1_allocation_Flow_23</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_24</bpmn:outgoing>
+      </bpmn:userTask>
+      <bpmn:serviceTask id="A1_allocation_retry" name="Release guide; count and exclude refusal">
+        <bpmn:incoming>A1_allocation_Flow_17</bpmn:incoming>
+        <bpmn:incoming>A1_allocation_Flow_18</bpmn:incoming>
+        <bpmn:incoming>A1_allocation_Flow_19</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_20</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:exclusiveGateway id="A1_allocation_limit" name="Fewer than 3 requests?">
+        <bpmn:incoming>A1_allocation_Flow_20</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_Flow_21</bpmn:outgoing>
+        <bpmn:outgoing>A1_allocation_Flow_22</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="A1_allocation_Flow_1" sourceRef="A1_allocation_a0" targetRef="A1_allocation_rule" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_2" sourceRef="A1_allocation_rule" targetRef="A1_allocation_available" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_3" name="Yes" sourceRef="A1_allocation_available" targetRef="A1_allocation_reserve" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_4" name="No" sourceRef="A1_allocation_available" targetRef="A1_allocation_manual" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_5" sourceRef="A1_allocation_reserve" targetRef="A1_allocation_request" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_6" sourceRef="A1_allocation_request" targetRef="A1_allocation_accept" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_7" sourceRef="A1_allocation_accept" targetRef="A1_allocation_ag" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_9" sourceRef="A1_allocation_manual" targetRef="A1_allocation_replacement" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_10" sourceRef="A1_allocation_record" targetRef="A1_allocation_notify" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_11" sourceRef="A1_allocation_notify" targetRef="A1_allocation_adone" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_12" sourceRef="A1_allocation_systemfail" targetRef="A1_allocation_repair" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_13" sourceRef="A1_allocation_repair" targetRef="A1_allocation_notify" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_14" name="Conditional" sourceRef="A1_allocation_ag" targetRef="A1_allocation_terms" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_15" sourceRef="A1_allocation_terms" targetRef="A1_allocation_termsok" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_16" name="Yes" sourceRef="A1_allocation_termsok" targetRef="A1_allocation_record" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_17" name="No" sourceRef="A1_allocation_termsok" targetRef="A1_allocation_retry" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_18" name="No" sourceRef="A1_allocation_ag" targetRef="A1_allocation_retry" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_19" sourceRef="A1_allocation_silent" targetRef="A1_allocation_retry" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_20" sourceRef="A1_allocation_retry" targetRef="A1_allocation_limit" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_21" name="Yes" sourceRef="A1_allocation_limit" targetRef="A1_allocation_rule" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_22" name="No" sourceRef="A1_allocation_limit" targetRef="A1_allocation_manual" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_23" sourceRef="A1_allocation_notifyfail" targetRef="A1_allocation_manualnotify" />
+      <bpmn:sequenceFlow id="A1_allocation_Flow_24" sourceRef="A1_allocation_manualnotify" targetRef="A1_allocation_adone" />
+      <bpmn:exclusiveGateway id="A1_allocation_replacement" name="Replacement guide found?">
+        <bpmn:incoming>A1_allocation_Flow_9</bpmn:incoming>
+        <bpmn:outgoing>A1_allocation_replacement_yes</bpmn:outgoing>
+        <bpmn:outgoing>A1_allocation_replacement_no</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:endEvent id="A1_allocation_noguide" name="No feasible guide">
+        <bpmn:incoming>A1_allocation_replacement_no</bpmn:incoming>
+        <bpmn:errorEventDefinition errorRef="A1_error_NOGUIDE" />
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="A1_allocation_replacement_yes" name="Yes" sourceRef="A1_allocation_replacement" targetRef="A1_allocation_ag" />
+      <bpmn:sequenceFlow id="A1_allocation_replacement_no" name="No" sourceRef="A1_allocation_replacement" targetRef="A1_allocation_noguide" />
+      <bpmn:sequenceFlow id="Flow_02zgi32" sourceRef="A1_allocation_ag" targetRef="A1_allocation_record" />
+    </bpmn:subProcess>
+    <bpmn:endEvent id="A1_Student_Project_noguideend" name="Closed: no guide available">
+      <bpmn:incoming>A1_Student_Project_noguideflow</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:boundaryEvent id="A1_Student_Project_noguide" name="No guide available" attachedToRef="A1_allocation">
+      <bpmn:outgoing>A1_Student_Project_noguideflow</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="A1_error_NOGUIDE" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A1_Student_Project_pc" name="Proposal closed" attachedToRef="A1_proposal">
+      <bpmn:outgoing>A1_Student_Project_Flow_5</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="A1_error_CLOSED" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A1_Student_Project_rc" name="Not approved" attachedToRef="A1_review">
+      <bpmn:outgoing>A1_Student_Project_Flow_10</bpmn:outgoing>
+      <bpmn:errorEventDefinition errorRef="A1_error_CLOSED" />
+    </bpmn:boundaryEvent>
+    <bpmn:boundaryEvent id="A1_Student_Project_withdraw" name="Team or guide withdraws" attachedToRef="A1_allocation">
+      <bpmn:outgoing>A1_Student_Project_Flow_6</bpmn:outgoing>
+      <bpmn:messageEventDefinition messageRef="A1_message_Withdrawal" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_1" sourceRef="A1_Student_Project_s" targetRef="A1_proposal" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_10" sourceRef="A1_Student_Project_rc" targetRef="A1_Student_Project_newlimit" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_11" name="Yes" sourceRef="A1_Student_Project_newlimit" targetRef="A1_Student_Project_closed" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_12" name="No" sourceRef="A1_Student_Project_newlimit" targetRef="A1_Student_Project_newtopic" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_13" sourceRef="A1_Student_Project_newtopic" targetRef="A1_Student_Project_newchoice" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_4" sourceRef="A1_allocation" targetRef="A1_Student_Project_done" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_6" sourceRef="A1_Student_Project_withdraw" targetRef="A1_Student_Project_release" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_7" sourceRef="A1_Student_Project_release" targetRef="A1_Student_Project_wg" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_8" name="Yes" sourceRef="A1_Student_Project_wg" targetRef="A1_allocation" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_9" name="No" sourceRef="A1_Student_Project_wg" targetRef="A1_Student_Project_withdrawn" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_15" name="No" sourceRef="A1_Student_Project_newchoice" targetRef="A1_Student_Project_closed" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_14" name="Yes" sourceRef="A1_Student_Project_newchoice" targetRef="A1_proposal" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_5" sourceRef="A1_Student_Project_pc" targetRef="A1_Student_Project_closed" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_2" sourceRef="A1_proposal" targetRef="A1_review" />
+    <bpmn:sequenceFlow id="A1_Student_Project_Flow_3" sourceRef="A1_review" targetRef="A1_allocation" />
+    <bpmn:sequenceFlow id="A1_Student_Project_noguideflow" sourceRef="A1_Student_Project_noguide" targetRef="A1_Student_Project_noguideend" />
+  </bpmn:process>
+  <bpmn:collaboration id="A1_Collaboration">
+    <bpmn:participant id="A1_Pool" name="Student Project Approval and Allocation" processRef="A1_Student_Project" />
+  </bpmn:collaboration>
+  <bpmn:error id="A1_error_CLOSED" name="CLOSED" errorCode="CLOSED" />
+  <bpmn:message id="A1_message_Withdrawal" name="Withdrawal" />
+  <bpmn:error id="A1_error_SYSTEM" name="SYSTEM" errorCode="SYSTEM" />
+  <bpmn:error id="A1_error_NOGUIDE" name="NO_GUIDE" errorCode="NO_GUIDE" />
+  <bpmndi:BPMNDiagram id="A1_Diagram_Student_Project">
+    <bpmndi:BPMNPlane id="A1_Plane_Student_Project" bpmnElement="A1_Collaboration">
+      <bpmndi:BPMNShape id="A1_Pool_di" bpmnElement="A1_Pool" isHorizontal="false">
+        <dc:Bounds x="160" y="70" width="1670" height="1700" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_MainLane_di" bpmnElement="A1_MainLane" isHorizontal="false">
+        <dc:Bounds x="200" y="70" width="620" height="1700" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_SupportLane_di" bpmnElement="A1_SupportLane" isHorizontal="false">
+        <dc:Bounds x="820" y="70" width="1010" height="1700" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_s_di" bpmnElement="A1_Student_Project_s">
+        <dc:Bounds x="505" y="160" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="485" y="210" width="81" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_newlimit_di" bpmnElement="A1_Student_Project_newlimit" isMarkerVisible="true">
+        <dc:Bounds x="970" y="730" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="849" y="783" width="121" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_newtopic_di" bpmnElement="A1_Student_Project_newtopic">
+        <dc:Bounds x="1070" y="970" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_done_di" bpmnElement="A1_Student_Project_done">
+        <dc:Bounds x="505" y="1380" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="484" y="1430" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_release_di" bpmnElement="A1_Student_Project_release">
+        <dc:Bounds x="970" y="1220" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_wg_di" bpmnElement="A1_Student_Project_wg" isMarkerVisible="true">
+        <dc:Bounds x="1270" y="1230" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1286" y="1203" width="87" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_withdrawn_di" bpmnElement="A1_Student_Project_withdrawn">
+        <dc:Bounds x="1590" y="1240" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1570" y="1290" width="80" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_newchoice_di" bpmnElement="A1_Student_Project_newchoice" isMarkerVisible="true">
+        <dc:Bounds x="1380" y="980" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1365" y="953" width="90" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_closed_di" bpmnElement="A1_Student_Project_closed">
+        <dc:Bounds x="1515" y="480" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1564.5" y="493" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_noguideend_di" bpmnElement="A1_Student_Project_noguideend">
+        <dc:Bounds x="1590" y="1480" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1545" y="1530" width="130" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_di" bpmnElement="A1_proposal" isExpanded="false">
+        <dc:Bounds x="410" y="350" width="230" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_di" bpmnElement="A1_review" isExpanded="false">
+        <dc:Bounds x="410" y="680" width="230" height="100" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_di" bpmnElement="A1_allocation" isExpanded="false">
+        <dc:Bounds x="410" y="1020" width="230" height="140" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_noguide_di" bpmnElement="A1_Student_Project_noguide">
+        <dc:Bounds x="620" y="1047" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="677" y="1055" width="91" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_pc_di" bpmnElement="A1_Student_Project_pc">
+        <dc:Bounds x="620" y="380" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="676" y="388" width="79" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_rc_di" bpmnElement="A1_Student_Project_rc">
+        <dc:Bounds x="620" y="710" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="682" y="718" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_Student_Project_withdraw_di" bpmnElement="A1_Student_Project_withdraw">
+        <dc:Bounds x="620" y="1093" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="676" y="1097" width="122" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_1_di" bpmnElement="A1_Student_Project_Flow_1">
+        <di:waypoint x="525" y="200" />
+        <di:waypoint x="525" y="225" />
+        <di:waypoint x="525" y="325" />
+        <di:waypoint x="525" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_10_di" bpmnElement="A1_Student_Project_Flow_10">
+        <di:waypoint x="660" y="730" />
+        <di:waypoint x="685" y="730" />
+        <di:waypoint x="685" y="760" />
+        <di:waypoint x="945" y="760" />
+        <di:waypoint x="970" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_11_di" bpmnElement="A1_Student_Project_Flow_11">
+        <di:waypoint x="1030" y="760" />
+        <di:waypoint x="1055" y="760" />
+        <di:waypoint x="1055" y="500" />
+        <di:waypoint x="1515" y="500" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1031" y="690" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_12_di" bpmnElement="A1_Student_Project_Flow_12">
+        <di:waypoint x="1030" y="760" />
+        <di:waypoint x="1055" y="760" />
+        <di:waypoint x="1055" y="1012.5" />
+        <di:waypoint x="1045" y="1012.5" />
+        <di:waypoint x="1070" y="1012.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1022" y="833" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_13_di" bpmnElement="A1_Student_Project_Flow_13">
+        <di:waypoint x="1280" y="1012.5" />
+        <di:waypoint x="1305" y="1012.5" />
+        <di:waypoint x="1305" y="1010" />
+        <di:waypoint x="1355" y="1010" />
+        <di:waypoint x="1380" y="1010" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_4_di" bpmnElement="A1_Student_Project_Flow_4">
+        <di:waypoint x="525" y="1160" />
+        <di:waypoint x="525" y="1185" />
+        <di:waypoint x="525" y="1355" />
+        <di:waypoint x="525" y="1380" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_6_di" bpmnElement="A1_Student_Project_Flow_6">
+        <di:waypoint x="660" y="1113.33" />
+        <di:waypoint x="685" y="1113.33" />
+        <di:waypoint x="685" y="1262.5" />
+        <di:waypoint x="945" y="1262.5" />
+        <di:waypoint x="970" y="1262.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_7_di" bpmnElement="A1_Student_Project_Flow_7">
+        <di:waypoint x="1180" y="1262.5" />
+        <di:waypoint x="1205" y="1262.5" />
+        <di:waypoint x="1205" y="1260" />
+        <di:waypoint x="1245" y="1260" />
+        <di:waypoint x="1270" y="1260" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_8_di" bpmnElement="A1_Student_Project_Flow_8">
+        <di:waypoint x="1270" y="1260" />
+        <di:waypoint x="1245" y="1260" />
+        <di:waypoint x="1245" y="1180" />
+        <di:waypoint x="385" y="1180" />
+        <di:waypoint x="385" y="1090" />
+        <di:waypoint x="410" y="1090" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1212" y="1205" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_9_di" bpmnElement="A1_Student_Project_Flow_9">
+        <di:waypoint x="1330" y="1260" />
+        <di:waypoint x="1355" y="1260" />
+        <di:waypoint x="1565" y="1260" />
+        <di:waypoint x="1590" y="1260" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1402" y="1243" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_15_di" bpmnElement="A1_Student_Project_Flow_15">
+        <di:waypoint x="1440" y="1010" />
+        <di:waypoint x="1535" y="1010" />
+        <di:waypoint x="1535" y="520" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1451" y="993" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_14_di" bpmnElement="A1_Student_Project_Flow_14">
+        <di:waypoint x="1380" y="1010" />
+        <di:waypoint x="1355" y="1010" />
+        <di:waypoint x="1355" y="542" />
+        <di:waypoint x="385" y="542" />
+        <di:waypoint x="385" y="400" />
+        <di:waypoint x="410" y="400" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1321" y="923" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_5_di" bpmnElement="A1_Student_Project_Flow_5">
+        <di:waypoint x="660" y="400" />
+        <di:waypoint x="1535" y="400" />
+        <di:waypoint x="1535" y="480" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_2_di" bpmnElement="A1_Student_Project_Flow_2">
+        <di:waypoint x="525" y="450" />
+        <di:waypoint x="525" y="475" />
+        <di:waypoint x="525" y="655" />
+        <di:waypoint x="525" y="680" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_Flow_3_di" bpmnElement="A1_Student_Project_Flow_3">
+        <di:waypoint x="525" y="780" />
+        <di:waypoint x="525" y="805" />
+        <di:waypoint x="525" y="995" />
+        <di:waypoint x="525" y="1020" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_Student_Project_noguideflow_di" bpmnElement="A1_Student_Project_noguideflow">
+        <di:waypoint x="660" y="1066.67" />
+        <di:waypoint x="685" y="1066.67" />
+        <di:waypoint x="1565" y="1066.67" />
+        <di:waypoint x="1565" y="1500" />
+        <di:waypoint x="1590" y="1500" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="A1_Diagram_proposal">
+    <bpmndi:BPMNPlane id="A1_Plane_proposal" bpmnElement="A1_proposal">
+      <bpmndi:BPMNShape id="A1_proposal_p0_di" bpmnElement="A1_proposal_p0">
+        <dc:Bounds x="400" y="100" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="375" y="150" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_submit_di" bpmnElement="A1_proposal_submit">
+        <dc:Bounds x="340" y="270" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_validate_di" bpmnElement="A1_proposal_validate">
+        <dc:Bounds x="340" y="490" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_valid_di" bpmnElement="A1_proposal_valid" isMarkerVisible="true">
+        <dc:Bounds x="410" y="710" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="337" y="743" width="66" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_screen_di" bpmnElement="A1_proposal_screen">
+        <dc:Bounds x="340" y="930" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_similar_di" bpmnElement="A1_proposal_similar">
+        <dc:Bounds x="340" y="1370" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_match_di" bpmnElement="A1_proposal_match" isMarkerVisible="true">
+        <dc:Bounds x="410" y="1570" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="306" y="1593" width="67" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_pdone_di" bpmnElement="A1_proposal_pdone">
+        <dc:Bounds x="420" y="1940" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="393.6" y="1990" width="92.8" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_correct_di" bpmnElement="A1_proposal_correct">
+        <dc:Bounds x="780" y="710" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_invalid_di" bpmnElement="A1_proposal_invalid">
+        <dc:Bounds x="1180" y="740" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1118.8" y="790" width="162.4" height="32" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_topic_di" bpmnElement="A1_proposal_topic">
+        <dc:Bounds x="780" y="1560" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_tg_di" bpmnElement="A1_proposal_tg" isMarkerVisible="true">
+        <dc:Bounds x="850" y="1770" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="755" y="1763" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_topicchange_di" bpmnElement="A1_proposal_topicchange">
+        <dc:Bounds x="1160" y="1780" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_preject_di" bpmnElement="A1_proposal_preject">
+        <dc:Bounds x="1220" y="2040" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1173.3" y="2090" width="133.4" height="32" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_latecheck_di" bpmnElement="A1_proposal_latecheck">
+        <dc:Bounds x="780" y="270" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_lg_di" bpmnElement="A1_proposal_lg" isMarkerVisible="true">
+        <dc:Bounds x="850" y="500" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="921" y="523" width="117" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_resources_di" bpmnElement="A1_proposal_resources" isMarkerVisible="true">
+        <dc:Bounds x="410" y="1140" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="287" y="1163" width="106" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_adapt_di" bpmnElement="A1_proposal_adapt">
+        <dc:Bounds x="780" y="1130" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_feasible_di" bpmnElement="A1_proposal_feasible" isMarkerVisible="true">
+        <dc:Bounds x="850" y="1350" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="923" y="1373" width="114" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_proposal_late_di" bpmnElement="A1_proposal_late">
+        <dc:Bounds x="530" y="292.5" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="580" y="296.5" width="145" height="32" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_1_di" bpmnElement="A1_proposal_Flow_1">
+        <di:waypoint x="420" y="140" />
+        <di:waypoint x="420" y="165" />
+        <di:waypoint x="420" y="245" />
+        <di:waypoint x="445" y="245" />
+        <di:waypoint x="445" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_2_di" bpmnElement="A1_proposal_Flow_2">
+        <di:waypoint x="445" y="355" />
+        <di:waypoint x="445" y="380" />
+        <di:waypoint x="445" y="465" />
+        <di:waypoint x="445" y="490" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_3_di" bpmnElement="A1_proposal_Flow_3">
+        <di:waypoint x="445" y="575" />
+        <di:waypoint x="445" y="600" />
+        <di:waypoint x="445" y="685" />
+        <di:waypoint x="440" y="685" />
+        <di:waypoint x="440" y="710" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_4_di" bpmnElement="A1_proposal_Flow_4">
+        <di:waypoint x="440" y="770" />
+        <di:waypoint x="440" y="795" />
+        <di:waypoint x="440" y="905" />
+        <di:waypoint x="445" y="905" />
+        <di:waypoint x="445" y="930" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="452" y="810" width="24" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_5_di" bpmnElement="A1_proposal_Flow_5">
+        <di:waypoint x="470" y="740" />
+        <di:waypoint x="495" y="740" />
+        <di:waypoint x="495" y="752.5" />
+        <di:waypoint x="755" y="752.5" />
+        <di:waypoint x="780" y="752.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="538" y="723" width="73" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_6_di" bpmnElement="A1_proposal_Flow_6">
+        <di:waypoint x="780" y="752.5" />
+        <di:waypoint x="755" y="752.5" />
+        <di:waypoint x="755" y="354.5" />
+        <di:waypoint x="315" y="354.5" />
+        <di:waypoint x="315" y="312.5" />
+        <di:waypoint x="340" y="312.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_7_di" bpmnElement="A1_proposal_Flow_7">
+        <di:waypoint x="470" y="740" />
+        <di:waypoint x="495" y="740" />
+        <di:waypoint x="495" y="817" />
+        <di:waypoint x="1155" y="817" />
+        <di:waypoint x="1155" y="760" />
+        <di:waypoint x="1180" y="760" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="580" y="790" width="60" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_8_di" bpmnElement="A1_proposal_Flow_8">
+        <di:waypoint x="445" y="1455" />
+        <di:waypoint x="445" y="1480" />
+        <di:waypoint x="445" y="1545" />
+        <di:waypoint x="440" y="1545" />
+        <di:waypoint x="440" y="1570" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_9_di" bpmnElement="A1_proposal_Flow_9">
+        <di:waypoint x="440" y="1630" />
+        <di:waypoint x="440" y="1655" />
+        <di:waypoint x="440" y="1915" />
+        <di:waypoint x="440" y="1940" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="432" y="1642.5" width="64" height="25" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_10_di" bpmnElement="A1_proposal_Flow_10">
+        <di:waypoint x="470" y="1600" />
+        <di:waypoint x="495" y="1600" />
+        <di:waypoint x="495" y="1602.5" />
+        <di:waypoint x="755" y="1602.5" />
+        <di:waypoint x="780" y="1602.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="566" y="1583" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_11_di" bpmnElement="A1_proposal_Flow_11">
+        <di:waypoint x="885" y="1645" />
+        <di:waypoint x="885" y="1670" />
+        <di:waypoint x="885" y="1745" />
+        <di:waypoint x="880" y="1745" />
+        <di:waypoint x="880" y="1770" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_12_di" bpmnElement="A1_proposal_Flow_12">
+        <di:waypoint x="850" y="1800" />
+        <di:waypoint x="825" y="1800" />
+        <di:waypoint x="825" y="1960" />
+        <di:waypoint x="485" y="1960" />
+        <di:waypoint x="460" y="1960" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="783" y="1843" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_13_di" bpmnElement="A1_proposal_Flow_13">
+        <di:waypoint x="910" y="1800" />
+        <di:waypoint x="935" y="1800" />
+        <di:waypoint x="935" y="1822.5" />
+        <di:waypoint x="1135" y="1822.5" />
+        <di:waypoint x="1160" y="1822.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="997" y="1793" width="65" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_14_di" bpmnElement="A1_proposal_Flow_14">
+        <di:waypoint x="910" y="1800" />
+        <di:waypoint x="935" y="1800" />
+        <di:waypoint x="935" y="2060" />
+        <di:waypoint x="1195" y="2060" />
+        <di:waypoint x="1220" y="2060" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="944" y="1873" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_15_di" bpmnElement="A1_proposal_Flow_15">
+        <di:waypoint x="1160" y="1822.5" />
+        <di:waypoint x="1135" y="1822.5" />
+        <di:waypoint x="1135" y="1037" />
+        <di:waypoint x="315" y="1037" />
+        <di:waypoint x="315" y="312.5" />
+        <di:waypoint x="340" y="312.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_16_di" bpmnElement="A1_proposal_Flow_16">
+        <di:waypoint x="570" y="312.5" />
+        <di:waypoint x="595" y="312.5" />
+        <di:waypoint x="755" y="312.5" />
+        <di:waypoint x="780" y="312.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_17_di" bpmnElement="A1_proposal_Flow_17">
+        <di:waypoint x="885" y="355" />
+        <di:waypoint x="885" y="380" />
+        <di:waypoint x="885" y="475" />
+        <di:waypoint x="880" y="475" />
+        <di:waypoint x="880" y="500" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_18_di" bpmnElement="A1_proposal_Flow_18">
+        <di:waypoint x="850" y="530" />
+        <di:waypoint x="825" y="530" />
+        <di:waypoint x="825" y="367.5" />
+        <di:waypoint x="315" y="367.5" />
+        <di:waypoint x="315" y="312.5" />
+        <di:waypoint x="340" y="312.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="791" y="493" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_19_di" bpmnElement="A1_proposal_Flow_19">
+        <di:waypoint x="880" y="560" />
+        <di:waypoint x="880" y="585" />
+        <di:waypoint x="1145" y="585" />
+        <di:waypoint x="1145" y="2015" />
+        <di:waypoint x="1240" y="2015" />
+        <di:waypoint x="1240" y="2040" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1052" y="568" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_20_di" bpmnElement="A1_proposal_Flow_20">
+        <di:waypoint x="445" y="1015" />
+        <di:waypoint x="445" y="1040" />
+        <di:waypoint x="445" y="1115" />
+        <di:waypoint x="440" y="1115" />
+        <di:waypoint x="440" y="1140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_21_di" bpmnElement="A1_proposal_Flow_21">
+        <di:waypoint x="440" y="1200" />
+        <di:waypoint x="440" y="1225" />
+        <di:waypoint x="440" y="1345" />
+        <di:waypoint x="445" y="1345" />
+        <di:waypoint x="445" y="1370" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="455" y="1263" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_22_di" bpmnElement="A1_proposal_Flow_22">
+        <di:waypoint x="470" y="1170" />
+        <di:waypoint x="495" y="1170" />
+        <di:waypoint x="495" y="1172.5" />
+        <di:waypoint x="755" y="1172.5" />
+        <di:waypoint x="780" y="1172.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="553" y="1143" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_23_di" bpmnElement="A1_proposal_Flow_23">
+        <di:waypoint x="885" y="1215" />
+        <di:waypoint x="885" y="1240" />
+        <di:waypoint x="885" y="1325" />
+        <di:waypoint x="880" y="1325" />
+        <di:waypoint x="880" y="1350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_24_di" bpmnElement="A1_proposal_Flow_24">
+        <di:waypoint x="850" y="1380" />
+        <di:waypoint x="825" y="1380" />
+        <di:waypoint x="825" y="1412.5" />
+        <di:waypoint x="575" y="1412.5" />
+        <di:waypoint x="550" y="1412.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="771" y="1393" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_proposal_Flow_25_di" bpmnElement="A1_proposal_Flow_25">
+        <di:waypoint x="880" y="1410" />
+        <di:waypoint x="880" y="1435" />
+        <di:waypoint x="1125" y="1435" />
+        <di:waypoint x="1125" y="2015" />
+        <di:waypoint x="1240" y="2015" />
+        <di:waypoint x="1240" y="2040" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="872" y="1422.5" width="64" height="25" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="A1_Diagram_review">
+    <bpmndi:BPMNPlane id="A1_Plane_review" bpmnElement="A1_review">
+      <bpmndi:BPMNShape id="A1_review_r0_di" bpmnElement="A1_review_r0">
+        <dc:Bounds x="400" y="100" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="375" y="150" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_evaluate_di" bpmnElement="A1_review_evaluate">
+        <dc:Bounds x="340" y="310" width="210" height="150" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_decision_di" bpmnElement="A1_review_decision" isMarkerVisible="true">
+        <dc:Bounds x="410" y="590" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="311" y="613" width="97" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_rdone_di" bpmnElement="A1_review_rdone">
+        <dc:Bounds x="420" y="1440" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="395" y="1490" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_revlimit_di" bpmnElement="A1_review_revlimit" isMarkerVisible="true">
+        <dc:Bounds x="790" y="610" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="861" y="633" width="117" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_revise_di" bpmnElement="A1_review_revise">
+        <dc:Bounds x="730" y="870" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_finalreview_di" bpmnElement="A1_review_finalreview">
+        <dc:Bounds x="730" y="1130" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_fg_di" bpmnElement="A1_review_fg" isMarkerVisible="true">
+        <dc:Bounds x="800" y="1390" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="797" y="1453" width="76" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_reasons_di" bpmnElement="A1_review_reasons">
+        <dc:Bounds x="1140" y="1590" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_notice_di" bpmnElement="A1_review_notice">
+        <dc:Bounds x="1120" y="300" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_remend_di" bpmnElement="A1_review_remend">
+        <dc:Bounds x="1480" y="330" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1455" y="380" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_hodnotice_di" bpmnElement="A1_review_hodnotice">
+        <dc:Bounds x="1120" y="550" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_hodend_di" bpmnElement="A1_review_hodend">
+        <dc:Bounds x="1560" y="573" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1546" y="623" width="68" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_rclosed_di" bpmnElement="A1_review_rclosed">
+        <dc:Bounds x="1225" y="1820" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1210" y="1870" width="71" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_revisiontime_di" bpmnElement="A1_review_revisiontime">
+        <dc:Bounds x="920" y="892.5" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="970" y="896.5" width="133.4" height="32" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_remind_di" bpmnElement="A1_review_remind">
+        <dc:Bounds x="530" y="323" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="588" y="327" width="130" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_review_hodtimer_di" bpmnElement="A1_review_hodtimer">
+        <dc:Bounds x="530" y="370" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="588" y="374" width="130" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A1_review_Flow_1_di" bpmnElement="A1_review_Flow_1">
+        <di:waypoint x="420" y="140" />
+        <di:waypoint x="420" y="165" />
+        <di:waypoint x="420" y="285" />
+        <di:waypoint x="445" y="285" />
+        <di:waypoint x="445" y="310" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_2_di" bpmnElement="A1_review_Flow_2">
+        <di:waypoint x="445" y="460" />
+        <di:waypoint x="445" y="485" />
+        <di:waypoint x="445" y="565" />
+        <di:waypoint x="440" y="565" />
+        <di:waypoint x="440" y="590" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_3_di" bpmnElement="A1_review_Flow_3">
+        <di:waypoint x="440" y="650" />
+        <di:waypoint x="440" y="675" />
+        <di:waypoint x="440" y="1415" />
+        <di:waypoint x="440" y="1440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="432" y="662.5" width="64" height="25" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_4_di" bpmnElement="A1_review_Flow_4">
+        <di:waypoint x="470" y="620" />
+        <di:waypoint x="495" y="620" />
+        <di:waypoint x="495" y="640" />
+        <di:waypoint x="765" y="640" />
+        <di:waypoint x="790" y="640" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="573" y="623" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_5_di" bpmnElement="A1_review_Flow_5">
+        <di:waypoint x="470" y="620" />
+        <di:waypoint x="495" y="620" />
+        <di:waypoint x="495" y="1632.5" />
+        <di:waypoint x="1115" y="1632.5" />
+        <di:waypoint x="1140" y="1632.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="504" y="703" width="32" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_6_di" bpmnElement="A1_review_Flow_6">
+        <di:waypoint x="820" y="670" />
+        <di:waypoint x="820" y="695" />
+        <di:waypoint x="820" y="845" />
+        <di:waypoint x="835" y="845" />
+        <di:waypoint x="835" y="870" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="826" y="763" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_7_di" bpmnElement="A1_review_Flow_7">
+        <di:waypoint x="730" y="912.5" />
+        <di:waypoint x="705" y="912.5" />
+        <di:waypoint x="315" y="912.5" />
+        <di:waypoint x="315" y="385" />
+        <di:waypoint x="340" y="385" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_8_di" bpmnElement="A1_review_Flow_8">
+        <di:waypoint x="820" y="670" />
+        <di:waypoint x="820" y="695" />
+        <di:waypoint x="708" y="695" />
+        <di:waypoint x="708" y="1105" />
+        <di:waypoint x="835" y="1105" />
+        <di:waypoint x="835" y="1130" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="720" y="763" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_9_di" bpmnElement="A1_review_Flow_9">
+        <di:waypoint x="835" y="1215" />
+        <di:waypoint x="835" y="1240" />
+        <di:waypoint x="835" y="1365" />
+        <di:waypoint x="830" y="1365" />
+        <di:waypoint x="830" y="1390" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_10_di" bpmnElement="A1_review_Flow_10">
+        <di:waypoint x="800" y="1420" />
+        <di:waypoint x="775" y="1420" />
+        <di:waypoint x="775" y="1460" />
+        <di:waypoint x="485" y="1460" />
+        <di:waypoint x="460" y="1460" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="696" y="1433" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_11_di" bpmnElement="A1_review_Flow_11">
+        <di:waypoint x="860" y="1420" />
+        <di:waypoint x="885" y="1420" />
+        <di:waypoint x="1115" y="1420" />
+        <di:waypoint x="1115" y="1632.5" />
+        <di:waypoint x="1140" y="1632.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="932" y="1403" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_12_di" bpmnElement="A1_review_Flow_12">
+        <di:waypoint x="940" y="932.5" />
+        <di:waypoint x="940" y="957.5" />
+        <di:waypoint x="1245" y="957.5" />
+        <di:waypoint x="1245" y="1565" />
+        <di:waypoint x="1245" y="1590" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_13_di" bpmnElement="A1_review_Flow_13">
+        <di:waypoint x="1245" y="1675" />
+        <di:waypoint x="1245" y="1820" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_14_di" bpmnElement="A1_review_Flow_14">
+        <di:waypoint x="570" y="343" />
+        <di:waypoint x="1120" y="343" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_15_di" bpmnElement="A1_review_Flow_15">
+        <di:waypoint x="1330" y="350" />
+        <di:waypoint x="1480" y="350" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_16_di" bpmnElement="A1_review_Flow_16">
+        <di:waypoint x="570" y="390" />
+        <di:waypoint x="1095" y="390" />
+        <di:waypoint x="1095" y="592.5" />
+        <di:waypoint x="1120" y="593" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_review_Flow_17_di" bpmnElement="A1_review_Flow_17">
+        <di:waypoint x="1330" y="593" />
+        <di:waypoint x="1560" y="593" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+  <bpmndi:BPMNDiagram id="A1_Diagram_allocation">
+    <bpmndi:BPMNPlane id="A1_Plane_allocation" bpmnElement="A1_allocation">
+      <bpmndi:BPMNShape id="A1_allocation_a0_di" bpmnElement="A1_allocation_a0">
+        <dc:Bounds x="400" y="100" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="375" y="150" width="90" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_rule_di" bpmnElement="A1_allocation_rule">
+        <dc:Bounds x="340" y="290" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_available_di" bpmnElement="A1_allocation_available" isMarkerVisible="true">
+        <dc:Bounds x="410" y="520" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="319" y="543" width="82" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_reserve_di" bpmnElement="A1_allocation_reserve">
+        <dc:Bounds x="340" y="750" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_request_di" bpmnElement="A1_allocation_request">
+        <dc:Bounds x="340" y="970" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_accept_di" bpmnElement="A1_allocation_accept">
+        <dc:Bounds x="340" y="1190" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_ag_di" bpmnElement="A1_allocation_ag" isMarkerVisible="true">
+        <dc:Bounds x="410" y="1410" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="311" y="1433" width="77" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_record_di" bpmnElement="A1_allocation_record">
+        <dc:Bounds x="340" y="1700" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_notify_di" bpmnElement="A1_allocation_notify">
+        <dc:Bounds x="340" y="1940" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_adone_di" bpmnElement="A1_allocation_adone">
+        <dc:Bounds x="420" y="2190" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="382" y="2240" width="116" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_repair_di" bpmnElement="A1_allocation_repair">
+        <dc:Bounds x="830" y="1710" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_terms_di" bpmnElement="A1_allocation_terms">
+        <dc:Bounds x="830" y="1190" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_termsok_di" bpmnElement="A1_allocation_termsok" isMarkerVisible="true">
+        <dc:Bounds x="900" y="1400" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="952" y="1383" width="96" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_manualnotify_di" bpmnElement="A1_allocation_manualnotify">
+        <dc:Bounds x="830" y="1940" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_retry_di" bpmnElement="A1_allocation_retry">
+        <dc:Bounds x="1250" y="1470" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_limit_di" bpmnElement="A1_allocation_limit" isMarkerVisible="true">
+        <dc:Bounds x="1300" y="1700" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1372" y="1723" width="116" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_replacement_di" bpmnElement="A1_allocation_replacement" isMarkerVisible="true">
+        <dc:Bounds x="920" y="760" width="60" height="60" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="918" y="820" width="65" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_noguide_di" bpmnElement="A1_allocation_noguide">
+        <dc:Bounds x="1290" y="770" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1260.7" y="820" width="98.6" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_manual_di" bpmnElement="A1_allocation_manual">
+        <dc:Bounds x="845" y="520" width="210" height="85" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_notifyfail_di" bpmnElement="A1_allocation_notifyfail">
+        <dc:Bounds x="530" y="1962.5" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="580" y="1970.5" width="110.2" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_systemfail_di" bpmnElement="A1_allocation_systemfail">
+        <dc:Bounds x="530" y="1722.5" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="580" y="1730.5" width="92.8" height="24" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="A1_allocation_silent_di" bpmnElement="A1_allocation_silent">
+        <dc:Bounds x="530" y="1212.5" width="40" height="40" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="605" y="1233" width="89" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_1_di" bpmnElement="A1_allocation_Flow_1">
+        <di:waypoint x="420" y="140" />
+        <di:waypoint x="420" y="165" />
+        <di:waypoint x="420" y="265" />
+        <di:waypoint x="445" y="265" />
+        <di:waypoint x="445" y="290" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_2_di" bpmnElement="A1_allocation_Flow_2">
+        <di:waypoint x="445" y="375" />
+        <di:waypoint x="445" y="400" />
+        <di:waypoint x="445" y="495" />
+        <di:waypoint x="440" y="495" />
+        <di:waypoint x="440" y="520" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_3_di" bpmnElement="A1_allocation_Flow_3">
+        <di:waypoint x="440" y="580" />
+        <di:waypoint x="440" y="605" />
+        <di:waypoint x="440" y="725" />
+        <di:waypoint x="445" y="725" />
+        <di:waypoint x="445" y="750" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="455" y="623" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_4_di" bpmnElement="A1_allocation_Flow_4">
+        <di:waypoint x="470" y="550" />
+        <di:waypoint x="495" y="550" />
+        <di:waypoint x="495" y="562.5" />
+        <di:waypoint x="825" y="563" />
+        <di:waypoint x="845" y="563" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="562" y="543" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_5_di" bpmnElement="A1_allocation_Flow_5">
+        <di:waypoint x="445" y="835" />
+        <di:waypoint x="445" y="860" />
+        <di:waypoint x="445" y="945" />
+        <di:waypoint x="445" y="970" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_6_di" bpmnElement="A1_allocation_Flow_6">
+        <di:waypoint x="445" y="1055" />
+        <di:waypoint x="445" y="1080" />
+        <di:waypoint x="445" y="1165" />
+        <di:waypoint x="445" y="1190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_7_di" bpmnElement="A1_allocation_Flow_7">
+        <di:waypoint x="445" y="1275" />
+        <di:waypoint x="445" y="1300" />
+        <di:waypoint x="445" y="1385" />
+        <di:waypoint x="440" y="1385" />
+        <di:waypoint x="440" y="1410" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_9_di" bpmnElement="A1_allocation_Flow_9">
+        <di:waypoint x="950" y="605" />
+        <di:waypoint x="950" y="760" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_10_di" bpmnElement="A1_allocation_Flow_10">
+        <di:waypoint x="445" y="1785" />
+        <di:waypoint x="445" y="1810" />
+        <di:waypoint x="445" y="1915" />
+        <di:waypoint x="445" y="1940" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_11_di" bpmnElement="A1_allocation_Flow_11">
+        <di:waypoint x="445" y="2025" />
+        <di:waypoint x="445" y="2050" />
+        <di:waypoint x="445" y="2165" />
+        <di:waypoint x="440" y="2165" />
+        <di:waypoint x="440" y="2190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_12_di" bpmnElement="A1_allocation_Flow_12">
+        <di:waypoint x="570" y="1742.5" />
+        <di:waypoint x="595" y="1742.5" />
+        <di:waypoint x="595" y="1752.5" />
+        <di:waypoint x="805" y="1752.5" />
+        <di:waypoint x="830" y="1752.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_13_di" bpmnElement="A1_allocation_Flow_13">
+        <di:waypoint x="830" y="1752.5" />
+        <di:waypoint x="805" y="1752.5" />
+        <di:waypoint x="805" y="1915" />
+        <di:waypoint x="445" y="1915" />
+        <di:waypoint x="445" y="1940" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_14_di" bpmnElement="A1_allocation_Flow_14">
+        <di:waypoint x="470" y="1440" />
+        <di:waypoint x="780" y="1440" />
+        <di:waypoint x="780" y="1233" />
+        <di:waypoint x="830" y="1233" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="512" y="1423" width="56" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_15_di" bpmnElement="A1_allocation_Flow_15">
+        <di:waypoint x="935" y="1275" />
+        <di:waypoint x="935" y="1300" />
+        <di:waypoint x="935" y="1375" />
+        <di:waypoint x="930" y="1375" />
+        <di:waypoint x="930" y="1400" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_16_di" bpmnElement="A1_allocation_Flow_16">
+        <di:waypoint x="900" y="1430" />
+        <di:waypoint x="875" y="1430" />
+        <di:waypoint x="875" y="1675" />
+        <di:waypoint x="445" y="1675" />
+        <di:waypoint x="445" y="1700" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="851" y="1486" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_17_di" bpmnElement="A1_allocation_Flow_17">
+        <di:waypoint x="960" y="1430" />
+        <di:waypoint x="985" y="1430" />
+        <di:waypoint x="1225" y="1430" />
+        <di:waypoint x="1225" y="1512.5" />
+        <di:waypoint x="1250" y="1512.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1012" y="1413" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_18_di" bpmnElement="A1_allocation_Flow_18">
+        <di:waypoint x="470" y="1440" />
+        <di:waypoint x="495" y="1440" />
+        <di:waypoint x="495" y="1512.5" />
+        <di:waypoint x="1225" y="1512.5" />
+        <di:waypoint x="1250" y="1512.5" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="502" y="1486" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_19_di" bpmnElement="A1_allocation_Flow_19">
+        <di:waypoint x="570" y="1232.5" />
+        <di:waypoint x="595" y="1232.5" />
+        <di:waypoint x="595" y="1505" />
+        <di:waypoint x="1225" y="1505" />
+        <di:waypoint x="1225" y="1512.5" />
+        <di:waypoint x="1250" y="1512.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_20_di" bpmnElement="A1_allocation_Flow_20">
+        <di:waypoint x="1355" y="1555" />
+        <di:waypoint x="1355" y="1580" />
+        <di:waypoint x="1355" y="1675" />
+        <di:waypoint x="1330" y="1675" />
+        <di:waypoint x="1330" y="1700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_21_di" bpmnElement="A1_allocation_Flow_21">
+        <di:waypoint x="1300" y="1730" />
+        <di:waypoint x="1075" y="1730" />
+        <di:waypoint x="1075" y="470" />
+        <di:waypoint x="445" y="470" />
+        <di:waypoint x="445" y="375" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1056" y="1125" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_22_di" bpmnElement="A1_allocation_Flow_22">
+        <di:waypoint x="1300" y="1730" />
+        <di:waypoint x="1228" y="1730" />
+        <di:waypoint x="1228" y="680" />
+        <di:waypoint x="960" y="680" />
+        <di:waypoint x="960" y="605" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1232" y="1666" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_23_di" bpmnElement="A1_allocation_Flow_23">
+        <di:waypoint x="570" y="1982.5" />
+        <di:waypoint x="595" y="1982.5" />
+        <di:waypoint x="805" y="1982.5" />
+        <di:waypoint x="830" y="1982.5" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_Flow_24_di" bpmnElement="A1_allocation_Flow_24">
+        <di:waypoint x="830" y="1982.5" />
+        <di:waypoint x="805" y="1982.5" />
+        <di:waypoint x="805" y="2210" />
+        <di:waypoint x="485" y="2210" />
+        <di:waypoint x="460" y="2210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_replacement_yes_di" bpmnElement="A1_allocation_replacement_yes">
+        <di:waypoint x="920" y="790" />
+        <di:waypoint x="895" y="790" />
+        <di:waypoint x="585" y="790" />
+        <di:waypoint x="585" y="1440" />
+        <di:waypoint x="495" y="1440" />
+        <di:waypoint x="470" y="1440" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="861" y="763" width="18" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="A1_allocation_replacement_no_di" bpmnElement="A1_allocation_replacement_no">
+        <di:waypoint x="980" y="790" />
+        <di:waypoint x="1005" y="790" />
+        <di:waypoint x="1265" y="790" />
+        <di:waypoint x="1290" y="790" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1012" y="763" width="15" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_02zgi32_di" bpmnElement="Flow_02zgi32">
+        <di:waypoint x="440" y="1470" />
+        <di:waypoint x="440" y="1495" />
+        <di:waypoint x="440" y="1675" />
+        <di:waypoint x="445" y="1675" />
+        <di:waypoint x="445" y="1700" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
