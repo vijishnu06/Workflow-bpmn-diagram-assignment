@@ -1,0 +1,92 @@
+[
+  {
+    "Case": "L1_REVIEW",
+    "Process": "loan_approval",
+    "ProcessInstanceKey": "2251799813784665",
+    "State": "COMPLETED",
+    "EndEvent": "Approved after review",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T09:24:19.265Z",
+    "EndDate": "2026-11-01T09:27:56.039Z"
+  },
+  {
+    "Case": "L1_WORKER_FAILURE",
+    "Process": "loan_approval",
+    "ProcessInstanceKey": "2251799813784701",
+    "State": "COMPLETED",
+    "EndEvent": "Approved",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T09:24:19.548Z",
+    "EndDate": "2026-11-01T09:32:13.754Z"
+  },
+  {
+    "Case": "L2_REVIEW",
+    "Process": "order_fulfilment",
+    "ProcessInstanceKey": "2251799813784713",
+    "State": "COMPLETED",
+    "EndEvent": "Order fulfilled",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T09:24:19.569Z",
+    "EndDate": "2026-11-01T09:31:17.308Z"
+  },
+  {
+    "Case": "L2_SERVICE_ERROR",
+    "Process": "order_fulfilment",
+    "ProcessInstanceKey": "2251799813784733",
+    "State": "COMPLETED",
+    "EndEvent": "Order fulfilled",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T09:24:19.609Z",
+    "EndDate": "2026-11-01T09:36:37.504Z"
+  },
+  {
+    "Case": "L3_PRIORITY",
+    "Process": "appointment_triage",
+    "ProcessInstanceKey": "2251799813784785",
+    "State": "COMPLETED",
+    "EndEvent": "Appointment booked",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T09:24:19.665Z",
+    "EndDate": "2026-11-01T09:35:22.457Z"
+  },
+  {
+    "Case": "L3_API_ERROR",
+    "Process": "appointment_triage",
+    "ProcessInstanceKey": "2251799813784820",
+    "State": "COMPLETED",
+    "EndEvent": "Appointment booked",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T09:24:19.719Z",
+    "EndDate": "2026-11-01T09:39:26.858Z"
+  },
+  {
+    "Case": "L1_WORKER_FAILURE",
+    "Process": "loan_approval",
+    "ProcessInstanceKey": "2251799813787883",
+    "State": "COMPLETED",
+    "EndEvent": "Approved",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T09:40:52.413Z",
+    "EndDate": "2026-11-01T09:52:09.831Z"
+  },
+  {
+    "Case": "L2_SERVICE_ERROR",
+    "Process": "order_fulfilment",
+    "ProcessInstanceKey": "2251799813787894",
+    "State": "COMPLETED",
+    "EndEvent": "Order fulfilled",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T09:40:52.473Z",
+    "EndDate": "2026-11-01T09:50:45.331Z"
+  },
+  {
+    "Case": "L3_API_ERROR",
+    "Process": "appointment_triage",
+    "ProcessInstanceKey": "2251799813787933",
+    "State": "COMPLETED",
+    "EndEvent": "Appointment booked",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T09:40:52.563Z",
+    "EndDate": "2026-11-01T09:49:10.459Z"
+  }
+]

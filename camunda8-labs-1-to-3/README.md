@@ -4,7 +4,7 @@ Three separate, deliberately compact Camunda 8 processes are in `lab1_loan`, `la
 
 ## Tested result
 
-The three BPMN/DMN pairs were deployed to local Camunda 8 Run 8.8.32 on 1 November 2026. The Java project built successfully. Sixteen synthetic instances were executed: all reached the expected end event. Five intentional worker/REST failures produced incidents, then completed after correcting the input and retrying. The measured results and instance IDs are in `evidence/run_results.csv`; four incident responses captured before retry are in `evidence/incident_*.json`.
+The three BPMN/DMN pairs were deployed to local Camunda 8 Run 8.8.32 on 1 November 2026. The Java project built successfully. Sixteen synthetic test instances reached their expected end events. Five intentional worker/REST failures produced incidents, then completed after correction and retry. The measured results are in `evidence/run_results.csv`. Nine further demonstration instances were run to capture Tasklist and incident/recovery evidence; all completed, as recorded in `evidence/screenshot_run_results.csv`.
 
 ## Start locally
 
@@ -28,7 +28,7 @@ The three REST tasks are configured with `io.camunda:http-json:1`, POST to `http
 
 ## Evidence status
 
-Three actual completed-instance screenshots supplied from the running implementation are in [evidence/screenshots](evidence/screenshots/). The other design PNGs are renderings of the authored models. The CSV and JSON files under `evidence` contain real local Camunda API results. **Tasklist, incident-investigation, and recovery screenshots are still outstanding** because browser access could not complete its automatic approval check. See the [evidence index](evidence/README.md) and [submission checklist](SUBMISSION_CHECKLIST.md). No placeholder screenshots are included.
+The [evidence index](evidence/README.md) includes actual screenshots for each lab's completed process, assigned Tasklist review, incident investigation, and recovery. Separate HTTP 503 detail captures and failed-route views support the REST incidents. The three original completed-instance PNGs were supplied by the student; the additional JPEGs were captured directly from the running local implementation. Design PNGs in the lab folders show the authored models. CSV and JSON files record real local Camunda API results. No placeholder screenshots are included. See the [submission checklist](SUBMISSION_CHECKLIST.md).
 
 The original version 1 deployments remain in the local cluster with three obsolete connector-configuration incidents. The submitted BPMN/DMN files are the corrected version 2 deployments, and their 16 recorded test cases all completed. Use version 2 for this assignment.
 

@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "processDefinitionId": "appointment_triage",
+      "errorType": "JOB_NO_RETRIES",
+      "errorMessage": "| Error variables: {error={message=, type=io.camunda.connector.api.error.ConnectorException, code=503, variables={response={headers={Transfer-Encoding=chunked, Connection=close, Date=Sun, 01 Nov 2026 09:40:54 GMT, Content-Type=application/json}, body={timestamp=2026-11-01T09:40:54.796+00:00, status=503, error=Service Unavailable, path=/mock/slots}}}}}",
+      "elementId": "slots",
+      "creationTime": "2026-11-01T09:40:54.804Z",
+      "state": "ACTIVE",
+      "tenantId": "<default>",
+      "incidentKey": "2251799813787975",
+      "processDefinitionKey": "2251799813770120",
+      "processInstanceKey": "2251799813787933",
+      "elementInstanceKey": "2251799813787964",
+      "jobKey": "2251799813787968"
+    }
+  ],
+  "page": {
+    "totalItems": 1,
+    "hasMoreTotalItems": false,
+    "startCursor": "WzIyNTE3OTk4MTM3ODc5NzVd",
+    "endCursor": "WzIyNTE3OTk4MTM3ODc5NzVd"
+  }
+}

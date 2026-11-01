@@ -1,0 +1,24 @@
+{
+  "items": [
+    {
+      "processDefinitionId": "order_fulfilment",
+      "errorType": "JOB_NO_RETRIES",
+      "errorMessage": "| Error variables: {error={message=, type=io.camunda.connector.api.error.ConnectorException, code=503, variables={response={headers={Transfer-Encoding=chunked, Connection=close, Date=Sun, 01 Nov 2026 09:24:21 GMT, Content-Type=application/json}, body={timestamp=2026-11-01T09:24:21.758+00:00, status=503, error=Service Unavailable, path=/mock/payment}}}}}",
+      "elementId": "pay",
+      "creationTime": "2026-11-01T09:24:21.766Z",
+      "state": "ACTIVE",
+      "tenantId": "<default>",
+      "incidentKey": "2251799813784872",
+      "processDefinitionKey": "2251799813770124",
+      "processInstanceKey": "2251799813784733",
+      "elementInstanceKey": "2251799813784778",
+      "jobKey": "2251799813784782"
+    }
+  ],
+  "page": {
+    "totalItems": 1,
+    "hasMoreTotalItems": false,
+    "startCursor": "WzIyNTE3OTk4MTM3ODQ4NzJd",
+    "endCursor": "WzIyNTE3OTk4MTM3ODQ4NzJd"
+  }
+}

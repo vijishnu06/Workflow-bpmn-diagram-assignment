@@ -11,9 +11,9 @@
 | Multiple tests with expected and actual results | Each lab's `test_cases.csv`; `test_inputs.json`; 16 recorded completed runs |
 | Deployment and execution evidence | Deployment keys in `DMN_SAMPLE_RESULTS.md`; actual definition versions and instance keys in `evidence/run_results.csv`; three Operate screenshots |
 | Intentional incidents and successful retry | Incident API records plus final results; recovery steps in `API_EXAMPLES.md` |
-| Actual Tasklist screenshots | **Outstanding** for all three labs |
-| Actual Operate incident and recovery screenshots | **Outstanding** for all three labs |
+| Actual Tasklist screenshots | Assigned loan, order, and staff scheduling reviews in `evidence/screenshots` |
+| Actual Operate incident and recovery screenshots | One incident and matching recovered instance per lab, plus REST error details; indexed in `evidence/README.md` |
 | Concise implementation report for each lab | Each lab's `REPORT.md` |
 | Synthetic data only | Synthetic references, mock payment tokens, educational triage flags; no real payment or patient information |
 
-This submission remains incomplete until the outstanding screenshots are added. The recorded API results are actual tests, and the three existing screenshots are genuine running-instance evidence.
+The screenshot evidence requirements are covered for all three labs. The original 16 tests and nine additional screenshot demonstration instances completed. Screenshots and API records are from the actual local implementation; no placeholder evidence is included.

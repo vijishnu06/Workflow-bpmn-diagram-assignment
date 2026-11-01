@@ -1,0 +1,32 @@
+[
+  {
+    "case": "L1_REVIEW",
+    "process": "loan_approval",
+    "key": "2251799813784665"
+  },
+  {
+    "case": "L1_WORKER_FAILURE",
+    "process": "loan_approval",
+    "key": "2251799813784701"
+  },
+  {
+    "case": "L2_REVIEW",
+    "process": "order_fulfilment",
+    "key": "2251799813784713"
+  },
+  {
+    "case": "L2_SERVICE_ERROR",
+    "process": "order_fulfilment",
+    "key": "2251799813784733"
+  },
+  {
+    "case": "L3_PRIORITY",
+    "process": "appointment_triage",
+    "key": "2251799813784785"
+  },
+  {
+    "case": "L3_API_ERROR",
+    "process": "appointment_triage",
+    "key": "2251799813784820"
+  }
+]

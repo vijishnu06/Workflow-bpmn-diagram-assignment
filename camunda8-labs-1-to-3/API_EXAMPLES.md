@@ -56,7 +56,7 @@ Open `http://localhost:8080/tasklist` using the local demo account. Select and a
 | Staff scheduling review | `{"slotSelected":true,"selectedSlot":"2026-11-05T10:00:00+05:30"}` to book; `{"slotSelected":false}` for no slot |
 | Immediate staff assessment | `{}`; completion records that simulated assessment occurred |
 
-The equivalent local API call is POST `/v2/user-tasks/USER_TASK_KEY/completion` with `{"variables":{...}}`. Find tasks with POST `/v2/user-tasks/search` and `{"filter":{"processInstanceKey":"INSTANCE_KEY"}}`. Recorded human-task tests used this API; Tasklist UI screenshots are still outstanding.
+The equivalent local API call is POST `/v2/user-tasks/USER_TASK_KEY/completion` with `{"variables":{...}}`. Find tasks with POST `/v2/user-tasks/search` and `{"filter":{"processInstanceKey":"INSTANCE_KEY"}}`. The initial 16-test suite used this API. The three later screenshot review cases were assigned and completed through the Tasklist UI, with `reviewApproved=true` or `slotSelected=true` entered in the task.
 
 ## Monitor and recover
 

@@ -1,0 +1,17 @@
+[
+  {
+    "case": "L1_WORKER_FAILURE",
+    "process": "loan_approval",
+    "key": "2251799813787883"
+  },
+  {
+    "case": "L2_SERVICE_ERROR",
+    "process": "order_fulfilment",
+    "key": "2251799813787894"
+  },
+  {
+    "case": "L3_API_ERROR",
+    "process": "appointment_triage",
+    "key": "2251799813787933"
+  }
+]
