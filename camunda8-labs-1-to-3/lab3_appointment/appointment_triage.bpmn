@@ -1,0 +1,194 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="appointment_triage_definitions" targetNamespace="https://example.org/education/camunda8" exporter="Codex" exporterVersion="1.0">
+  <bpmn:process id="appointment_triage" name="appointment triage" isExecutable="true">
+    <bpmn:startEvent id="start" name="Request received" />
+    <bpmn:serviceTask id="validate" name="Validate registration">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="patient-validate" retries="2" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="valid" name="Valid request?" gatewayDirection="Diverging" />
+    <bpmn:endEvent id="invalid" name="Invalid request" />
+    <bpmn:businessRuleTask id="triage" name="Triage category (DMN)">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="patient_triage" resultVariable="triageCategory" />
+      </bpmn:extensionElements>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="urgent" name="Urgent?" gatewayDirection="Diverging" />
+    <bpmn:userTask id="assessment" name="Immediate staff assessment">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+    </bpmn:userTask>
+    <bpmn:endEvent id="assessed" name="Assessment recorded" />
+    <bpmn:serviceTask id="slots" name="Get slots (REST)">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="2" />
+        <zeebe:ioMapping>
+          <zeebe:input source="http://localhost:8085/mock/slots" target="url" />
+          <zeebe:input source="POST" target="method" />
+          <zeebe:input source="= { patientRef: patientRef, appointmentPreference: appointmentPreference, simulateError: simulateSchedulingError }" target="body" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="resultVariable" value="slotResponse" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="route" name="Review needed?" gatewayDirection="Diverging" />
+    <bpmn:userTask id="review" name="Staff scheduling review">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="reviewSlot" name="Slot selected?" gatewayDirection="Diverging" />
+    <bpmn:endEvent id="noSlot" name="No slot available" />
+    <bpmn:serviceTask id="book" name="Book appointment">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="appointment-book" retries="2" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="done" name="Appointment booked" />
+    <bpmn:sequenceFlow id="flow_1" sourceRef="start" targetRef="validate" />
+    <bpmn:sequenceFlow id="flow_2" sourceRef="validate" targetRef="valid" />
+    <bpmn:sequenceFlow id="flow_3" sourceRef="valid" targetRef="invalid" name="No">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= registrationValid = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_4" sourceRef="valid" targetRef="triage" name="Yes">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= registrationValid = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_5" sourceRef="triage" targetRef="urgent" />
+    <bpmn:sequenceFlow id="flow_6" sourceRef="urgent" targetRef="assessment" name="Yes">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= triageCategory = "Urgent Assessment"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_7" sourceRef="urgent" targetRef="slots" name="No">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= triageCategory != "Urgent Assessment"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_8" sourceRef="assessment" targetRef="assessed" />
+    <bpmn:sequenceFlow id="flow_9" sourceRef="slots" targetRef="route" />
+    <bpmn:sequenceFlow id="flow_10" sourceRef="route" targetRef="review" name="Yes">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= triageCategory = "Priority Review" or count(slotResponse.body.slots) = 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_11" sourceRef="route" targetRef="book" name="No">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= triageCategory = "Routine" and count(slotResponse.body.slots) &gt; 0</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_12" sourceRef="review" targetRef="reviewSlot" />
+    <bpmn:sequenceFlow id="flow_13" sourceRef="reviewSlot" targetRef="noSlot" name="No">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= slotSelected = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="reviewSlot" targetRef="book" name="Yes">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= slotSelected = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_15" sourceRef="book" targetRef="done" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="appointment_triage_diagram">
+    <bpmndi:BPMNPlane id="appointment_triage_plane" bpmnElement="appointment_triage">
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="80" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="validate_di" bpmnElement="validate">
+        <dc:Bounds x="180" y="188" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="valid_di" bpmnElement="valid">
+        <dc:Bounds x="370" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="invalid_di" bpmnElement="invalid">
+        <dc:Bounds x="445" y="365" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="triage_di" bpmnElement="triage">
+        <dc:Bounds x="470" y="188" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="urgent_di" bpmnElement="urgent">
+        <dc:Bounds x="660" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="assessment_di" bpmnElement="assessment">
+        <dc:Bounds x="740" y="345" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="assessed_di" bpmnElement="assessed">
+        <dc:Bounds x="950" y="365" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="slots_di" bpmnElement="slots">
+        <dc:Bounds x="760" y="188" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="route_di" bpmnElement="route">
+        <dc:Bounds x="950" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="review_di" bpmnElement="review">
+        <dc:Bounds x="1040" y="345" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="reviewSlot_di" bpmnElement="reviewSlot">
+        <dc:Bounds x="1240" y="365" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="noSlot_di" bpmnElement="noSlot">
+        <dc:Bounds x="1410" y="470" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="book_di" bpmnElement="book">
+        <dc:Bounds x="1240" y="188" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="done_di" bpmnElement="done">
+        <dc:Bounds x="1430" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow_1_di" bpmnElement="flow_1">
+        <di:waypoint x="116" y="228.0" />
+        <di:waypoint x="180" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_2_di" bpmnElement="flow_2">
+        <di:waypoint x="320" y="228.0" />
+        <di:waypoint x="370" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_3_di" bpmnElement="flow_3">
+        <di:waypoint x="406" y="228.0" />
+        <di:waypoint x="445" y="383.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_4_di" bpmnElement="flow_4">
+        <di:waypoint x="406" y="228.0" />
+        <di:waypoint x="470" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_5_di" bpmnElement="flow_5">
+        <di:waypoint x="610" y="228.0" />
+        <di:waypoint x="660" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_6_di" bpmnElement="flow_6">
+        <di:waypoint x="696" y="228.0" />
+        <di:waypoint x="740" y="385.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_7_di" bpmnElement="flow_7">
+        <di:waypoint x="696" y="228.0" />
+        <di:waypoint x="760" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_8_di" bpmnElement="flow_8">
+        <di:waypoint x="880" y="385.0" />
+        <di:waypoint x="950" y="383.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_9_di" bpmnElement="flow_9">
+        <di:waypoint x="900" y="228.0" />
+        <di:waypoint x="950" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_10_di" bpmnElement="flow_10">
+        <di:waypoint x="986" y="228.0" />
+        <di:waypoint x="1040" y="385.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_11_di" bpmnElement="flow_11">
+        <di:waypoint x="986" y="228.0" />
+        <di:waypoint x="1240" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_12_di" bpmnElement="flow_12">
+        <di:waypoint x="1180" y="385.0" />
+        <di:waypoint x="1240" y="383.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_13_di" bpmnElement="flow_13">
+        <di:waypoint x="1276" y="383.0" />
+        <di:waypoint x="1410" y="488.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_14_di" bpmnElement="flow_14">
+        <di:waypoint x="1258.0" y="365" />
+        <di:waypoint x="1258.0" y="143" />
+        <di:waypoint x="1310.0" y="143" />
+        <di:waypoint x="1310.0" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_15_di" bpmnElement="flow_15">
+        <di:waypoint x="1380" y="228.0" />
+        <di:waypoint x="1430" y="228.0" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

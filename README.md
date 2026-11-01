@@ -1,5 +1,7 @@
 # BPMN Process Modeling — Assignment Submission
 
+The new [Camunda 8 practical labs 1–3](camunda8-labs-1-to-3/) contain loan approval, e-commerce fulfilment, and hospital appointment workflows, each with BPMN, DMN, Spring Boot source, API examples, reports, and recorded test results. Sixteen synthetic instances completed their expected routes, including five incident/recovery tests. Three actual Operate screenshots are included. Tasklist and incident/recovery UI screenshots are still outstanding; the [submission checklist](camunda8-labs-1-to-3/SUBMISSION_CHECKLIST.md) states the remaining evidence explicitly.
+
 The repository includes the original three introductory BPMN 2.0 models below, plus two Camunda 8 executable assignment models. The `ex3/` folder contains **Assignment 1: Student Project Approval & Allocation** and **Assignment 2: Logistics & Shipment Exception Management**, with failure path registers and Camunda 8 execution notes in its README. The `.bpmn` files open in Camunda Modeler.
 
 ## Repository Structure
@@ -9,6 +11,15 @@ The repository includes the original three introductory BPMN 2.0 models below, p
 ├── scenario1_leave_approval.bpmn
 ├── scenario2_purchase_order.bpmn
 ├── scenario3_it_service_request.bpmn
+├── camunda8-labs-1-to-3/
+│   ├── README.md
+│   ├── API_EXAMPLES.md
+│   ├── SUBMISSION_CHECKLIST.md
+│   ├── lab1_loan/
+│   ├── lab2_order/
+│   ├── lab3_appointment/
+│   ├── src/
+│   └── evidence/
 └── ex3/
     ├── README.md
     ├── assignment1_student_project_approval.bpmn

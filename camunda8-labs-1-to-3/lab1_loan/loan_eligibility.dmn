@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='utf-8'?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" id="loan_eligibility_defs" name="loan_eligibility" namespace="https://example.org/education/camunda8">
+  <decision id="loan_eligibility" name="loan eligibility">
+    <decisionTable id="loan_eligibility_table" hitPolicy="FIRST">
+      <input id="i_valid" label="Validated">
+        <inputExpression id="i_valid_expr" typeRef="boolean">
+          <text>validationOk</text>
+        </inputExpression>
+      </input>
+      <input id="i_income" label="Monthly income">
+        <inputExpression id="i_income_expr" typeRef="number">
+          <text>monthlyIncome</text>
+        </inputExpression>
+      </input>
+      <input id="i_amount" label="Requested amount">
+        <inputExpression id="i_amount_expr" typeRef="number">
+          <text>requestedAmount</text>
+        </inputExpression>
+      </input>
+      <input id="i_score" label="Credit score">
+        <inputExpression id="i_score_expr" typeRef="number">
+          <text>creditResponse.body.score</text>
+        </inputExpression>
+      </input>
+      <output id="out_loanDecision" name="loanDecision" typeRef="string" />
+      <rule id="rule_1">
+        <inputEntry id="in_1_0">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="in_1_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_1_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_1_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_1">
+          <text>"Rejected"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_2">
+        <inputEntry id="in_2_0">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="in_2_1">
+          <text>&lt; 2000</text>
+        </inputEntry>
+        <inputEntry id="in_2_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_2_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_2">
+          <text>"Rejected"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3">
+        <inputEntry id="in_3_0">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="in_3_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_3_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_3_3">
+          <text>&lt; 550</text>
+        </inputEntry>
+        <outputEntry id="out_3">
+          <text>"Rejected"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_4">
+        <inputEntry id="in_4_0">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="in_4_1">
+          <text>[2000..3999]</text>
+        </inputEntry>
+        <inputEntry id="in_4_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_4_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_4">
+          <text>"Manual Review"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_5">
+        <inputEntry id="in_5_0">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="in_5_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_5_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_5_3">
+          <text>[550..699]</text>
+        </inputEntry>
+        <outputEntry id="out_5">
+          <text>"Manual Review"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_6">
+        <inputEntry id="in_6_0">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="in_6_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_6_2">
+          <text> &gt; monthlyIncome * 12</text>
+        </inputEntry>
+        <inputEntry id="in_6_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_6">
+          <text>"Manual Review"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_7">
+        <inputEntry id="in_7_0">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="in_7_1">
+          <text>&gt;= 4000</text>
+        </inputEntry>
+        <inputEntry id="in_7_2">
+          <text>&lt;= monthlyIncome * 12</text>
+        </inputEntry>
+        <inputEntry id="in_7_3">
+          <text>&gt;= 700</text>
+        </inputEntry>
+        <outputEntry id="out_7">
+          <text>"Approved"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_8">
+        <inputEntry id="in_8_0">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_8_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_8_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_8_3">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_8">
+          <text>"Manual Review"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

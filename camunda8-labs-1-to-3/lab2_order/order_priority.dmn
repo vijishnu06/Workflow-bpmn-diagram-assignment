@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf-8'?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" id="order_priority_defs" name="order_priority" namespace="https://example.org/education/camunda8">
+  <decision id="order_priority" name="order priority">
+    <decisionTable id="order_priority_table" hitPolicy="FIRST">
+      <input id="i_value" label="Order total">
+        <inputExpression id="i_value_expr" typeRef="number">
+          <text>orderTotal</text>
+        </inputExpression>
+      </input>
+      <input id="i_cat" label="Customer category">
+        <inputExpression id="i_cat_expr" typeRef="string">
+          <text>customerCategory</text>
+        </inputExpression>
+      </input>
+      <input id="i_pref" label="Delivery preference">
+        <inputExpression id="i_pref_expr" typeRef="string">
+          <text>deliveryPreference</text>
+        </inputExpression>
+      </input>
+      <output id="out_orderPriority" name="orderPriority" typeRef="string" />
+      <rule id="rule_1">
+        <inputEntry id="in_1_0">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_1_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_1_2">
+          <text>"express"</text>
+        </inputEntry>
+        <outputEntry id="out_1">
+          <text>"Express"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_2">
+        <inputEntry id="in_2_0">
+          <text>&gt;= 1000</text>
+        </inputEntry>
+        <inputEntry id="in_2_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_2_2">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_2">
+          <text>"High"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3">
+        <inputEntry id="in_3_0">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_3_1">
+          <text>"premium"</text>
+        </inputEntry>
+        <inputEntry id="in_3_2">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_3">
+          <text>"High"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_4">
+        <inputEntry id="in_4_0">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_4_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_4_2">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_4">
+          <text>"Standard"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

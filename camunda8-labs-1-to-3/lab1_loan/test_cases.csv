@@ -1,0 +1,6 @@
+Case,Inputs,Expected route,Actual outcome,Status
+L1_APPROVE,"{""applicantRef"":""A-100"",""monthlyIncome"":5000,""requestedAmount"":10000,""failWorker"":false,""simulateApiError"":false}",Approved,Completed: Approved; instance 2251799813770184,Passed
+L1_REJECT,"{""applicantRef"":""A-101"",""monthlyIncome"":1500,""requestedAmount"":10000,""failWorker"":false,""simulateApiError"":false}",Rejected by DMN,Completed: Rejected; instance 2251799813770716,Passed
+L1_REVIEW,"{""applicantRef"":""A-102"",""monthlyIncome"":3000,""requestedAmount"":12000,""failWorker"":false,""simulateApiError"":false}; complete human task with {""reviewApproved"": true}",Tasklist review then approved,Completed: Approved after review; instance 2251799813770740,Passed
+L1_API_ERROR,"{""applicantRef"":""A-103"",""monthlyIncome"":5000,""requestedAmount"":10000,""failWorker"":false,""simulateApiError"":true}",REST job incident then retry after correction,"Incident reproduced, corrected, retried; completed: Approved; instance 2251799813770763",Passed
+L1_WORKER_FAILURE,"{""applicantRef"":""A-104"",""monthlyIncome"":5000,""requestedAmount"":10000,""failWorker"":true,""simulateApiError"":false}",Worker incident then retry after correction,"Incident reproduced, corrected, retried; completed: Approved; instance 2251799813770798",Passed

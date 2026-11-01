@@ -1,0 +1,178 @@
+[
+  {
+    "Case": "L1_APPROVE",
+    "Process": "loan_approval",
+    "ProcessInstanceKey": "2251799813770184",
+    "State": "COMPLETED",
+    "EndEvent": "Approved",
+    "Decision": "\"Approved\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:39:56.099Z",
+    "EndDate": "2026-11-01T05:45:00.143Z"
+  },
+  {
+    "Case": "L2_PAID",
+    "Process": "order_fulfilment",
+    "ProcessInstanceKey": "2251799813770243",
+    "State": "COMPLETED",
+    "EndEvent": "Order fulfilled",
+    "Decision": "\"Standard\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:39:57.188Z",
+    "EndDate": "2026-11-01T05:45:00.394Z"
+  },
+  {
+    "Case": "L3_ROUTINE",
+    "Process": "appointment_triage",
+    "ProcessInstanceKey": "2251799813770208",
+    "State": "COMPLETED",
+    "EndEvent": "Appointment booked",
+    "Decision": "\"Routine\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:39:56.838Z",
+    "EndDate": "2026-11-01T05:45:00.378Z"
+  },
+  {
+    "Case": "L1_REJECT",
+    "Process": "loan_approval",
+    "ProcessInstanceKey": "2251799813770716",
+    "State": "COMPLETED",
+    "EndEvent": "Rejected",
+    "Decision": "\"Rejected\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:25.359Z",
+    "EndDate": "2026-11-01T05:46:25.739Z"
+  },
+  {
+    "Case": "L1_REVIEW",
+    "Process": "loan_approval",
+    "ProcessInstanceKey": "2251799813770740",
+    "State": "COMPLETED",
+    "EndEvent": "Approved after review",
+    "Decision": "\"Manual Review\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:25.65Z",
+    "EndDate": "2026-11-01T05:47:18.287Z"
+  },
+  {
+    "Case": "L1_API_ERROR",
+    "Process": "loan_approval",
+    "ProcessInstanceKey": "2251799813770763",
+    "State": "COMPLETED",
+    "EndEvent": "Approved",
+    "Decision": "\"Approved\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:25.868Z",
+    "EndDate": "2026-11-01T05:48:22.692Z"
+  },
+  {
+    "Case": "L1_WORKER_FAILURE",
+    "Process": "loan_approval",
+    "ProcessInstanceKey": "2251799813770798",
+    "State": "COMPLETED",
+    "EndEvent": "Approved",
+    "Decision": "\"Approved\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:26.235Z",
+    "EndDate": "2026-11-01T05:50:29.319Z"
+  },
+  {
+    "Case": "L2_NO_STOCK",
+    "Process": "order_fulfilment",
+    "ProcessInstanceKey": "2251799813770823",
+    "State": "COMPLETED",
+    "EndEvent": "Out of stock",
+    "Decision": null,
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:26.682Z",
+    "EndDate": "2026-11-01T05:46:26.939Z"
+  },
+  {
+    "Case": "L2_DECLINED",
+    "Process": "order_fulfilment",
+    "ProcessInstanceKey": "2251799813770840",
+    "State": "COMPLETED",
+    "EndEvent": "Payment declined",
+    "Decision": "\"Standard\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:26.801Z",
+    "EndDate": "2026-11-01T05:46:27.372Z"
+  },
+  {
+    "Case": "L2_REVIEW",
+    "Process": "order_fulfilment",
+    "ProcessInstanceKey": "2251799813770866",
+    "State": "COMPLETED",
+    "EndEvent": "Order fulfilled",
+    "Decision": "\"High\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:26.985Z",
+    "EndDate": "2026-11-01T05:47:31.198Z"
+  },
+  {
+    "Case": "L2_SERVICE_ERROR",
+    "Process": "order_fulfilment",
+    "ProcessInstanceKey": "2251799813770904",
+    "State": "COMPLETED",
+    "EndEvent": "Order fulfilled",
+    "Decision": "\"Standard\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:27.3Z",
+    "EndDate": "2026-11-01T05:50:29.401Z"
+  },
+  {
+    "Case": "L2_WORKER_ERROR",
+    "Process": "order_fulfilment",
+    "ProcessInstanceKey": "2251799813770943",
+    "State": "COMPLETED",
+    "EndEvent": "Order fulfilled",
+    "Decision": "\"Standard\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:27.46Z",
+    "EndDate": "2026-11-01T05:50:29.539Z"
+  },
+  {
+    "Case": "L3_PRIORITY",
+    "Process": "appointment_triage",
+    "ProcessInstanceKey": "2251799813770980",
+    "State": "COMPLETED",
+    "EndEvent": "Appointment booked",
+    "Decision": "\"Priority Review\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:27.636Z",
+    "EndDate": "2026-11-01T05:47:31.541Z"
+  },
+  {
+    "Case": "L3_URGENT",
+    "Process": "appointment_triage",
+    "ProcessInstanceKey": "2251799813771000",
+    "State": "COMPLETED",
+    "EndEvent": "Assessment recorded",
+    "Decision": "\"Urgent Assessment\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:27.889Z",
+    "EndDate": "2026-11-01T05:47:31.909Z"
+  },
+  {
+    "Case": "L3_NO_SLOT",
+    "Process": "appointment_triage",
+    "ProcessInstanceKey": "2251799813771037",
+    "State": "COMPLETED",
+    "EndEvent": "No slot available",
+    "Decision": "\"Routine\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:28.091Z",
+    "EndDate": "2026-11-01T05:47:32.094Z"
+  },
+  {
+    "Case": "L3_API_ERROR",
+    "Process": "appointment_triage",
+    "ProcessInstanceKey": "2251799813771077",
+    "State": "COMPLETED",
+    "EndEvent": "Appointment booked",
+    "Decision": "\"Routine\"",
+    "IncidentNow": false,
+    "StartDate": "2026-11-01T05:46:28.286Z",
+    "EndDate": "2026-11-01T05:50:29.564Z"
+  }
+]

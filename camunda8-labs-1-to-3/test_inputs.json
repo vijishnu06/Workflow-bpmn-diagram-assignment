@@ -1,0 +1,266 @@
+[
+  {
+    "case": "L1_APPROVE",
+    "processDefinitionId": "loan_approval",
+    "variables": {
+      "applicantRef": "A-100",
+      "monthlyIncome": 5000,
+      "requestedAmount": 10000,
+      "failWorker": false,
+      "simulateApiError": false
+    }
+  },
+  {
+    "case": "L1_REJECT",
+    "processDefinitionId": "loan_approval",
+    "variables": {
+      "applicantRef": "A-101",
+      "monthlyIncome": 1500,
+      "requestedAmount": 10000,
+      "failWorker": false,
+      "simulateApiError": false
+    }
+  },
+  {
+    "case": "L1_REVIEW",
+    "processDefinitionId": "loan_approval",
+    "variables": {
+      "applicantRef": "A-102",
+      "monthlyIncome": 3000,
+      "requestedAmount": 12000,
+      "failWorker": false,
+      "simulateApiError": false
+    },
+    "humanTaskCompletionVariables": {
+      "reviewApproved": true
+    }
+  },
+  {
+    "case": "L1_API_ERROR",
+    "processDefinitionId": "loan_approval",
+    "variables": {
+      "applicantRef": "A-103",
+      "monthlyIncome": 5000,
+      "requestedAmount": 10000,
+      "failWorker": false,
+      "simulateApiError": true
+    },
+    "recovery": {
+      "scope": "failed task",
+      "variable": "body.simulateError",
+      "correctedValue": false
+    }
+  },
+  {
+    "case": "L1_WORKER_FAILURE",
+    "processDefinitionId": "loan_approval",
+    "variables": {
+      "applicantRef": "A-104",
+      "monthlyIncome": 5000,
+      "requestedAmount": 10000,
+      "failWorker": true,
+      "simulateApiError": false
+    },
+    "recovery": {
+      "scope": "process",
+      "variable": "failWorker",
+      "correctedValue": false
+    }
+  },
+  {
+    "case": "L2_PAID",
+    "processDefinitionId": "order_fulfilment",
+    "variables": {
+      "orderRef": "O-100",
+      "productId": "P1",
+      "quantity": 2,
+      "stockCount": 10,
+      "unitPrice": 100,
+      "customerCategory": "regular",
+      "deliveryPreference": "standard",
+      "paymentToken": "tok_ok",
+      "failInventoryWorker": false,
+      "simulatePaymentError": false
+    }
+  },
+  {
+    "case": "L2_NO_STOCK",
+    "processDefinitionId": "order_fulfilment",
+    "variables": {
+      "orderRef": "O-101",
+      "productId": "P1",
+      "quantity": 20,
+      "stockCount": 10,
+      "unitPrice": 100,
+      "customerCategory": "regular",
+      "deliveryPreference": "standard",
+      "paymentToken": "tok_ok",
+      "failInventoryWorker": false,
+      "simulatePaymentError": false
+    }
+  },
+  {
+    "case": "L2_DECLINED",
+    "processDefinitionId": "order_fulfilment",
+    "variables": {
+      "orderRef": "O-102",
+      "productId": "P1",
+      "quantity": 2,
+      "stockCount": 10,
+      "unitPrice": 100,
+      "customerCategory": "regular",
+      "deliveryPreference": "standard",
+      "paymentToken": "tok_decline",
+      "failInventoryWorker": false,
+      "simulatePaymentError": false
+    }
+  },
+  {
+    "case": "L2_REVIEW",
+    "processDefinitionId": "order_fulfilment",
+    "variables": {
+      "orderRef": "O-103",
+      "productId": "P1",
+      "quantity": 2,
+      "stockCount": 10,
+      "unitPrice": 600,
+      "customerCategory": "regular",
+      "deliveryPreference": "standard",
+      "paymentToken": "tok_ok",
+      "failInventoryWorker": false,
+      "simulatePaymentError": false
+    },
+    "humanTaskCompletionVariables": {
+      "reviewApproved": true
+    }
+  },
+  {
+    "case": "L2_SERVICE_ERROR",
+    "processDefinitionId": "order_fulfilment",
+    "variables": {
+      "orderRef": "O-104",
+      "productId": "P1",
+      "quantity": 2,
+      "stockCount": 10,
+      "unitPrice": 100,
+      "customerCategory": "regular",
+      "deliveryPreference": "standard",
+      "paymentToken": "tok_ok",
+      "failInventoryWorker": false,
+      "simulatePaymentError": true
+    },
+    "recovery": {
+      "scope": "failed task",
+      "variable": "body.simulateError",
+      "correctedValue": false
+    }
+  },
+  {
+    "case": "L2_WORKER_ERROR",
+    "processDefinitionId": "order_fulfilment",
+    "variables": {
+      "orderRef": "O-105",
+      "productId": "P1",
+      "quantity": 2,
+      "stockCount": 10,
+      "unitPrice": 100,
+      "customerCategory": "regular",
+      "deliveryPreference": "standard",
+      "paymentToken": "tok_ok",
+      "failInventoryWorker": true,
+      "simulatePaymentError": false
+    },
+    "recovery": {
+      "scope": "process",
+      "variable": "failInventoryWorker",
+      "correctedValue": false
+    }
+  },
+  {
+    "case": "L3_ROUTINE",
+    "processDefinitionId": "appointment_triage",
+    "variables": {
+      "patientRef": "P-100",
+      "appointmentPreference": "morning",
+      "symptomsSummary": "synthetic mild symptoms",
+      "emergencyIndicator": false,
+      "severeSymptoms": false,
+      "priorityIndicator": false,
+      "selectedSlot": "2026-11-05T10:00:00+05:30",
+      "failRegistrationWorker": false,
+      "simulateSchedulingError": false
+    }
+  },
+  {
+    "case": "L3_PRIORITY",
+    "processDefinitionId": "appointment_triage",
+    "variables": {
+      "patientRef": "P-101",
+      "appointmentPreference": "morning",
+      "symptomsSummary": "synthetic mild symptoms",
+      "emergencyIndicator": false,
+      "severeSymptoms": false,
+      "priorityIndicator": true,
+      "selectedSlot": "2026-11-05T10:00:00+05:30",
+      "failRegistrationWorker": false,
+      "simulateSchedulingError": false
+    },
+    "humanTaskCompletionVariables": {
+      "slotSelected": true
+    }
+  },
+  {
+    "case": "L3_URGENT",
+    "processDefinitionId": "appointment_triage",
+    "variables": {
+      "patientRef": "P-102",
+      "appointmentPreference": "morning",
+      "symptomsSummary": "synthetic mild symptoms",
+      "emergencyIndicator": true,
+      "severeSymptoms": false,
+      "priorityIndicator": false,
+      "selectedSlot": "2026-11-05T10:00:00+05:30",
+      "failRegistrationWorker": false,
+      "simulateSchedulingError": false
+    },
+    "humanTaskCompletionVariables": {}
+  },
+  {
+    "case": "L3_NO_SLOT",
+    "processDefinitionId": "appointment_triage",
+    "variables": {
+      "patientRef": "P-103",
+      "appointmentPreference": "none",
+      "symptomsSummary": "synthetic mild symptoms",
+      "emergencyIndicator": false,
+      "severeSymptoms": false,
+      "priorityIndicator": false,
+      "selectedSlot": "2026-11-05T10:00:00+05:30",
+      "failRegistrationWorker": false,
+      "simulateSchedulingError": false
+    },
+    "humanTaskCompletionVariables": {
+      "slotSelected": false
+    }
+  },
+  {
+    "case": "L3_API_ERROR",
+    "processDefinitionId": "appointment_triage",
+    "variables": {
+      "patientRef": "P-104",
+      "appointmentPreference": "morning",
+      "symptomsSummary": "synthetic mild symptoms",
+      "emergencyIndicator": false,
+      "severeSymptoms": false,
+      "priorityIndicator": false,
+      "selectedSlot": "2026-11-05T10:00:00+05:30",
+      "failRegistrationWorker": false,
+      "simulateSchedulingError": true
+    },
+    "recovery": {
+      "scope": "failed task",
+      "variable": "body.simulateError",
+      "correctedValue": false
+    }
+  }
+]

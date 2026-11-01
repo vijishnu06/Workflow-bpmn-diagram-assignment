@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='utf-8'?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" id="patient_triage_defs" name="patient_triage" namespace="https://example.org/education/camunda8">
+  <decision id="patient_triage" name="patient triage">
+    <decisionTable id="patient_triage_table" hitPolicy="FIRST">
+      <input id="i_red" label="Emergency indicator">
+        <inputExpression id="i_red_expr" typeRef="boolean">
+          <text>emergencyIndicator</text>
+        </inputExpression>
+      </input>
+      <input id="i_severe" label="Severe symptoms">
+        <inputExpression id="i_severe_expr" typeRef="boolean">
+          <text>severeSymptoms</text>
+        </inputExpression>
+      </input>
+      <input id="i_priority" label="Priority indicator">
+        <inputExpression id="i_priority_expr" typeRef="boolean">
+          <text>priorityIndicator</text>
+        </inputExpression>
+      </input>
+      <output id="out_triageCategory" name="triageCategory" typeRef="string" />
+      <rule id="rule_1">
+        <inputEntry id="in_1_0">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="in_1_1">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_1_2">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_1">
+          <text>"Urgent Assessment"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_2">
+        <inputEntry id="in_2_0">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="in_2_1">
+          <text>true</text>
+        </inputEntry>
+        <inputEntry id="in_2_2">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="out_2">
+          <text>"Urgent Assessment"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_3">
+        <inputEntry id="in_3_0">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="in_3_1">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="in_3_2">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="out_3">
+          <text>"Priority Review"</text>
+        </outputEntry>
+      </rule>
+      <rule id="rule_4">
+        <inputEntry id="in_4_0">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="in_4_1">
+          <text>false</text>
+        </inputEntry>
+        <inputEntry id="in_4_2">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="out_4">
+          <text>"Routine"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

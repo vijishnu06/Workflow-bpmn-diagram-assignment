@@ -1,0 +1,1 @@
+{"customerRef":"C-100","orderRef":"O-100","productId":"P1","quantity":2,"stockCount":10,"unitPrice":100,"customerCategory":"regular","deliveryPreference":"standard","paymentToken":"tok_ok","failInventoryWorker":false,"simulatePaymentError":false}

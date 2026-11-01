@@ -1,0 +1,181 @@
+<?xml version='1.0' encoding='utf-8'?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:zeebe="http://camunda.org/schema/zeebe/1.0" id="order_fulfilment_definitions" targetNamespace="https://example.org/education/camunda8" exporter="Codex" exporterVersion="1.0">
+  <bpmn:process id="order_fulfilment" name="order fulfilment" isExecutable="true">
+    <bpmn:startEvent id="start" name="Order received" />
+    <bpmn:serviceTask id="validate" name="Validate order and stock">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="order-validate" retries="2" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="stock" name="Stock available?" gatewayDirection="Diverging" />
+    <bpmn:endEvent id="out" name="Out of stock" />
+    <bpmn:businessRuleTask id="priority" name="Set priority (DMN)">
+      <bpmn:extensionElements>
+        <zeebe:calledDecision decisionId="order_priority" resultVariable="orderPriority" />
+      </bpmn:extensionElements>
+    </bpmn:businessRuleTask>
+    <bpmn:exclusiveGateway id="high" name="High value?" gatewayDirection="Diverging" />
+    <bpmn:userTask id="verify" name="Manual order verification">
+      <bpmn:extensionElements>
+        <zeebe:userTask />
+      </bpmn:extensionElements>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="verified" name="Verified?" gatewayDirection="Diverging" />
+    <bpmn:endEvent id="reviewNo" name="Rejected by reviewer" />
+    <bpmn:serviceTask id="pay" name="Take mock payment (REST)">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="io.camunda:http-json:1" retries="2" />
+        <zeebe:ioMapping>
+          <zeebe:input source="http://localhost:8085/mock/payment" target="url" />
+          <zeebe:input source="POST" target="method" />
+          <zeebe:input source="= { orderRef: orderRef, orderTotal: orderTotal, paymentToken: paymentToken, simulateError: simulatePaymentError }" target="body" />
+        </zeebe:ioMapping>
+        <zeebe:taskHeaders>
+          <zeebe:header key="resultVariable" value="paymentResponse" />
+        </zeebe:taskHeaders>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:exclusiveGateway id="paid" name="Payment accepted?" gatewayDirection="Diverging" />
+    <bpmn:endEvent id="declined" name="Payment declined" />
+    <bpmn:serviceTask id="fulfil" name="Fulfil order">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="order-fulfil" retries="2" />
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="done" name="Order fulfilled" />
+    <bpmn:sequenceFlow id="flow_1" sourceRef="start" targetRef="validate" />
+    <bpmn:sequenceFlow id="flow_2" sourceRef="validate" targetRef="stock" />
+    <bpmn:sequenceFlow id="flow_3" sourceRef="stock" targetRef="out" name="No">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= stockAvailable = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_4" sourceRef="stock" targetRef="priority" name="Yes">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= stockAvailable = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_5" sourceRef="priority" targetRef="high" />
+    <bpmn:sequenceFlow id="flow_6" sourceRef="high" targetRef="verify" name="Yes">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= orderTotal &gt;= 1000</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_7" sourceRef="high" targetRef="pay" name="No">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= orderTotal &lt; 1000</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_8" sourceRef="verify" targetRef="verified" />
+    <bpmn:sequenceFlow id="flow_9" sourceRef="verified" targetRef="reviewNo" name="No">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= reviewApproved = false</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_10" sourceRef="verified" targetRef="pay" name="Yes">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= reviewApproved = true</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_11" sourceRef="pay" targetRef="paid" />
+    <bpmn:sequenceFlow id="flow_12" sourceRef="paid" targetRef="declined" name="No">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= paymentResponse.body.status = "DECLINED"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_13" sourceRef="paid" targetRef="fulfil" name="Yes">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">= paymentResponse.body.status = "PAID"</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="flow_14" sourceRef="fulfil" targetRef="done" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="order_fulfilment_diagram">
+    <bpmndi:BPMNPlane id="order_fulfilment_plane" bpmnElement="order_fulfilment">
+      <bpmndi:BPMNShape id="start_di" bpmnElement="start">
+        <dc:Bounds x="80" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="validate_di" bpmnElement="validate">
+        <dc:Bounds x="180" y="188" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="stock_di" bpmnElement="stock">
+        <dc:Bounds x="370" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="out_di" bpmnElement="out">
+        <dc:Bounds x="445" y="365" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="priority_di" bpmnElement="priority">
+        <dc:Bounds x="470" y="188" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="high_di" bpmnElement="high">
+        <dc:Bounds x="660" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="verify_di" bpmnElement="verify">
+        <dc:Bounds x="750" y="340" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="verified_di" bpmnElement="verified">
+        <dc:Bounds x="950" y="360" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="reviewNo_di" bpmnElement="reviewNo">
+        <dc:Bounds x="1120" y="470" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="pay_di" bpmnElement="pay">
+        <dc:Bounds x="950" y="188" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="paid_di" bpmnElement="paid">
+        <dc:Bounds x="1150" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="declined_di" bpmnElement="declined">
+        <dc:Bounds x="1320" y="350" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="fulfil_di" bpmnElement="fulfil">
+        <dc:Bounds x="1320" y="188" width="140" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="done_di" bpmnElement="done">
+        <dc:Bounds x="1510" y="210" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="flow_1_di" bpmnElement="flow_1">
+        <di:waypoint x="116" y="228.0" />
+        <di:waypoint x="180" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_2_di" bpmnElement="flow_2">
+        <di:waypoint x="320" y="228.0" />
+        <di:waypoint x="370" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_3_di" bpmnElement="flow_3">
+        <di:waypoint x="406" y="228.0" />
+        <di:waypoint x="445" y="383.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_4_di" bpmnElement="flow_4">
+        <di:waypoint x="406" y="228.0" />
+        <di:waypoint x="470" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_5_di" bpmnElement="flow_5">
+        <di:waypoint x="610" y="228.0" />
+        <di:waypoint x="660" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_6_di" bpmnElement="flow_6">
+        <di:waypoint x="696" y="228.0" />
+        <di:waypoint x="750" y="380.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_7_di" bpmnElement="flow_7">
+        <di:waypoint x="696" y="228.0" />
+        <di:waypoint x="950" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_8_di" bpmnElement="flow_8">
+        <di:waypoint x="890" y="380.0" />
+        <di:waypoint x="950" y="378.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_9_di" bpmnElement="flow_9">
+        <di:waypoint x="986" y="378.0" />
+        <di:waypoint x="1120" y="488.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_10_di" bpmnElement="flow_10">
+        <di:waypoint x="968.0" y="360" />
+        <di:waypoint x="968.0" y="143" />
+        <di:waypoint x="1020.0" y="143" />
+        <di:waypoint x="1020.0" y="188" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_11_di" bpmnElement="flow_11">
+        <di:waypoint x="1090" y="228.0" />
+        <di:waypoint x="1150" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_12_di" bpmnElement="flow_12">
+        <di:waypoint x="1186" y="228.0" />
+        <di:waypoint x="1320" y="368.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_13_di" bpmnElement="flow_13">
+        <di:waypoint x="1186" y="228.0" />
+        <di:waypoint x="1320" y="228.0" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="flow_14_di" bpmnElement="flow_14">
+        <di:waypoint x="1460" y="228.0" />
+        <di:waypoint x="1510" y="228.0" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
