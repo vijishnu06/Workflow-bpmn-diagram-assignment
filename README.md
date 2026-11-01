@@ -4,6 +4,8 @@ This repository brings together the BPMN assignments completed for the course. T
 
 Each lab has its BPMN and DMN files, Java workers, test inputs, results, and a short report. The [screenshots](camunda8-labs-1-to-3/evidence/README.md) show the processes running in Camunda, including human reviews and recovery from failed jobs. All 16 main tests and nine additional demonstration runs completed.
 
+**Evidence status: Complete.** All three labs have their required screenshots and test results saved in the repository.
+
 ## Where to find the work
 
 | Folder or file | Contents |

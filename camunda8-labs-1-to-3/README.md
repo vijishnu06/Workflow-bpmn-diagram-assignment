@@ -42,9 +42,11 @@ For a worker failure, change its failure flag to `false` before retrying. A fail
 
 The connector responses are read through `creditResponse.body`, `paymentResponse.body`, or `slotResponse.body`. The REST tasks use job type `io.camunda:http-json:1` and POST to the mock endpoints under `http://localhost:8085/mock/`.
 
-## Screenshots and model versions
+## Evidence status: Complete
 
-The evidence folder contains real captures from the running implementation: completed processes, assigned reviews, incidents, and recovery. It also has separate views of the payment and scheduling HTTP 503 errors. The design PNGs in the lab folders are exports of the diagrams.
+All three labs have the required screenshots: a completed process, an assigned Tasklist review, a failed job in Operate, and the same instance after recovery. The folder contains 16 actual screenshots, including extra views of the payment and scheduling errors. The test results and instance IDs are saved alongside them in the [evidence folder](evidence/README.md).
+
+## Model version used
 
 Use **version 2** in the tested local cluster. Version 1 was an earlier deployment with incorrect connector settings, and its old incidents are still visible in Operate. The submitted files contain the corrected settings.
 

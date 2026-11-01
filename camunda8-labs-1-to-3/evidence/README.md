@@ -1,5 +1,7 @@
 # Screenshots and test results
 
+**Status: Complete.** Screenshots for successful execution, Tasklist review, incident investigation, and recovery are included for all three labs. There are 16 actual screenshots in total, and all recorded test and demonstration runs completed.
+
 These screenshots were taken from the local Camunda 8 Run 8.8.32 setup on 1 November 2026. They show successful runs, waiting review tasks, failed jobs, and the same jobs after recovery. The first three completed-process images were captured manually. The remaining images were captured during new demonstration runs. Diagram exports are saved separately in each lab folder.
 
 ## Screenshots for each lab
