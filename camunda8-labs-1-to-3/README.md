@@ -1,46 +1,53 @@
-# Camunda 8 practical assignment - Labs 1 to 3
+# Camunda 8 practical labs
 
-Three separate, deliberately compact Camunda 8 processes are in `lab1_loan`, `lab2_order`, and `lab3_appointment`. Each folder contains one executable BPMN file, one DMN decision table, a design PNG, test cases, and a short report. The shared Spring Boot project implements the job workers and three synthetic REST endpoints.
+These three labs cover loan approval, order processing, and hospital appointments. Each process has one main route, with separate branches for review, rejection, or another outcome. This keeps the diagrams easy to follow during a demonstration.
 
-## Tested result
+| Lab | Files and explanation |
+|---|---|
+| 1. Loan approval | [Model, decision table, and report](lab1_loan/) |
+| 2. Order processing | [Model, decision table, and report](lab2_order/) |
+| 3. Hospital appointments | [Model, decision table, and report](lab3_appointment/) |
 
-The three BPMN/DMN pairs were deployed to local Camunda 8 Run 8.8.32 on 1 November 2026. The Java project built successfully. Sixteen synthetic test instances reached their expected end events. Five intentional worker/REST failures produced incidents, then completed after correction and retry. The measured results are in `evidence/run_results.csv`. Nine further demonstration instances were run to capture Tasklist and incident/recovery evidence; all completed, as recorded in `evidence/screenshot_run_results.csv`.
+The BPMN files control the flow. DMN tables make the decisions, Java workers validate or complete work, and REST connectors call the mock services. All examples use made-up data and mock payment tokens.
 
-## Start locally
+## Run the project
 
-1. Start C8 Run from `C:\camunda\c8run` with `c8run.exe start`. Wait for `http://localhost:8080/operate` and `http://localhost:8080/tasklist` to open. Default local login is `demo` / `demo`.
-2. Use Java 17 or later and Maven 3.9+. Run `mvn clean package`, then `java -jar target/camunda8-labs-1.0.0.jar` in this directory, or use `mvn spring-boot:run`. The downloadable local ZIP also contains the built JAR. The mock API listens on port 8085. Keep it running throughout testing.
-3. Deploy each `.dmn` and `.bpmn` file in Camunda Modeler to the local cluster. Set authentication to **None**. Deploy the matching DMN before its BPMN, or deploy both together.
-4. Start instances with the synthetic JSON examples in each lab folder. Set every `simulate...Error` and `fail...Worker` flag explicitly to `false` for ordinary cases.
-5. Complete human review tasks in Tasklist, setting the indicated Boolean variable. Inspect the finished instance, variables, and activities in Operate.
-6. For incident evidence, start an instance with an error flag `true`, wait for retries to exhaust, capture the incident in Operate, correct the flag or mock-service cause, then retry the job. For a REST task, edit the existing task-local `body` object and set its `simulateError` member to `false`; the input mapping has already copied this value, so changing only the root flag does not update the failed request. For a validation worker, change its root failure flag to `false`. See [API examples](API_EXAMPLES.md).
+The project was tested with Camunda 8 Run 8.8.32. You will also need Java 17 or later and Maven 3.9 or later.
 
-## Design principles
+1. Start Camunda 8 Run. On the machine used for testing, it is installed at `C:\camunda\c8run`; run `c8run.exe start` from that folder.
+2. Open Operate at `http://localhost:8080/operate` and Tasklist at `http://localhost:8080/tasklist`. The local demo login is `demo` / `demo`.
+3. From this project folder, run `mvn clean package`, then `java -jar target/camunda8-labs-1.0.0.jar`. You can also use `mvn spring-boot:run`. The local ZIP includes a built JAR. Keep the application running: it provides the workers and mock APIs on port 8085.
+4. Deploy each lab's BPMN and DMN together from Camunda Modeler, or deploy the DMN first. Use authentication **None** for this local setup.
+5. Start a process using the JSON example in its lab folder. For a normal run, set the failure flags to `false`.
+6. Complete any review task in Tasklist, then open the instance in Operate to check its route and variables.
 
-- One main horizontal flow per process; only meaningful rejection and review branches.
-- DMN owns business classification. Workers validate or fulfil. REST connectors call local mock services.
-- Failed REST calls or worker exceptions consume job retries and create incidents for Operate investigation; no fabricated success route is drawn.
-- All data is synthetic. Payment tokens are mock strings such as `tok_ok` and `tok_decline`.
+The [API examples](API_EXAMPLES.md) include deployment commands, requests, review variables, and retry steps. The connector runtime must be running along with Camunda. If it runs on another machine or in a container, replace the mock API's `localhost` address with one that the connector can reach.
 
-## Connector notes
+## What was tested
 
-The three REST tasks are configured with `io.camunda:http-json:1`, POST to `http://localhost:8085/mock/...`, a FEEL request body, and a result variable. C8 Run's connector runtime must be active. If the connector runtime is containerized on another host, replace `localhost` with an address reachable from that runtime before deployment. The result is read from `creditResponse.body`, `paymentResponse.body`, or `slotResponse.body`.
+The main test set contains 16 cases. These cover normal outcomes, rejection, manual review, and failed services or workers. Every case reached its expected end event. Five cases deliberately caused an incident; each completed after the cause was fixed and the job was retried.
 
-## Evidence status
+Nine more instances were used for the screenshots. The three review tasks were assigned and completed in Tasklist, and the failed jobs were retried in Operate. These runs also completed.
 
-The [evidence index](evidence/README.md) includes actual screenshots for each lab's completed process, assigned Tasklist review, incident investigation, and recovery. Separate HTTP 503 detail captures and failed-route views support the REST incidents. The three original completed-instance PNGs were supplied by the student; the additional JPEGs were captured directly from the running local implementation. Design PNGs in the lab folders show the authored models. CSV and JSON files record real local Camunda API results. No placeholder screenshots are included. See the [submission checklist](SUBMISSION_CHECKLIST.md).
+- [Test inputs](test_inputs.json) contains the full input for each main case. Supply `humanTaskCompletionVariables` when completing the task, rather than when starting the process.
+- [Main test results](evidence/run_results.csv) lists the 16 original runs.
+- [Screenshot run results](evidence/screenshot_run_results.csv) lists the later demonstrations.
+- [Screenshots and instance IDs](evidence/README.md) connects each image to the process it shows.
+- [Decision examples](DMN_SAMPLE_RESULTS.md) explains the DMN inputs and sample results.
+- [Submission checklist](SUBMISSION_CHECKLIST.md) shows where each required item is saved.
 
-The original version 1 deployments remain in the local cluster with three obsolete connector-configuration incidents. The submitted BPMN/DMN files are the corrected version 2 deployments, and their 16 recorded test cases all completed. Use version 2 for this assignment.
+## A note about retries
 
-## Files to review
+For a worker failure, change its failure flag to `false` before retrying. A failed REST task needs one extra step: update the existing task's `body` object so that `simulateError` is `false`. The request body was copied when the task started, so changing only the process-level flag will not change that saved request.
 
-- Each lab folder: BPMN, DMN, design image, report, test table, and a start JSON example.
-- [test_inputs.json](test_inputs.json): full synthetic inputs for all 16 cases. `humanTaskCompletionVariables` belongs in the human task completion, rather than the initial request.
-- [API_EXAMPLES.md](API_EXAMPLES.md): deployment, start, mock API, review, monitoring, and incident recovery examples.
-- [DMN_SAMPLE_RESULTS.md](DMN_SAMPLE_RESULTS.md): rules and actual decision examples.
-- [evidence/run_results.csv](evidence/run_results.csv): recorded instance keys, decisions, states, and end events.
+The connector responses are read through `creditResponse.body`, `paymentResponse.body`, or `slotResponse.body`. The REST tasks use job type `io.camunda:http-json:1` and POST to the mock endpoints under `http://localhost:8085/mock/`.
 
-## Sources
+## Screenshots and model versions
 
-- Assignment brief: `Camunda8_Practical_Assignment_Labs_1_to_3.pdf` (provided by the student).
-- Camunda 8 service tasks, user tasks, business rule tasks, REST connector, and Spring Boot starter: `https://docs.camunda.io/`.
+The evidence folder contains real captures from the running implementation: completed processes, assigned reviews, incidents, and recovery. It also has separate views of the payment and scheduling HTTP 503 errors. The design PNGs in the lab folders are exports of the diagrams.
+
+Use **version 2** in the tested local cluster. Version 1 was an earlier deployment with incorrect connector settings, and its old incidents are still visible in Operate. The submitted files contain the corrected settings.
+
+## References
+
+The requirements come from `Camunda8_Practical_Assignment_Labs_1_to_3.pdf`. Camunda setup and model configuration were checked against the [Camunda documentation](https://docs.camunda.io/).

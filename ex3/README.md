@@ -1,23 +1,23 @@
-# BPMN Project Assignments - Camunda 8
+# Student project and logistics assignments
 
-This folder contains two BPMN 2.0 process models prepared for **Camunda 8**. The selected topics are Assignment 1, Student Project Approval & Allocation, and Assignment 2, Logistics & Shipment Exception Management.
+This folder has the two BPMN models for student project approval and logistics exception handling. Both were prepared for Camunda 8 and can be opened in Camunda Modeler.
 
 ## Files
 
 ```text
 ex3/
 |-- README.md
-|-- assignment1_student_project_approval.bpmn
-`-- assignment2_logistics_shipment_exception.bpmn
+|-- Assignment_1_Student_Project_Approval.bpmn
+`-- Assignment_2_Logistics_and_Shipment_Exception.bpmn
 ```
 
-Both processes are marked `isExecutable="true"`, include BPMN Diagram Interchange (BPMNDI) layout, and use Camunda 8 Zeebe task definitions. Open either `.bpmn` file in Camunda Modeler to inspect, edit, or deploy it.
+Both files are marked executable and include their diagram layout and Camunda 8 job types. Open either file in Modeler to follow the routes or check the task settings.
 
 ## Assignment 1 - Student Project Approval & Allocation
 
-The happy path starts with a student team proposal, checks its form and team rules, screens the topic for similarity, obtains committee approval, matches a guide, waits for the guide's response, and records and notifies the confirmed allocation.
+The process starts when a team submits a proposal. It checks the form, team rules, and topic similarity before sending the proposal to the committee. An approved proposal is matched with a guide. Once the guide accepts, the allocation is recorded and the team is notified.
 
-| ID | Failure and modeled resolution |
+| ID | What can go wrong and how the process handles it |
 |---|---|
 | F1 | Missing or invalid fields return a checklist for correction. The attempt counter limits resubmission to two tries before coordinator review. |
 | F2 | Invalid team composition is recorded, the team is notified, and the case closes with an invalid-team outcome. |
@@ -31,7 +31,7 @@ The happy path starts with a student team proposal, checks its form and team rul
 | F10 | Notification and record tasks retry up to three times. A BPMN error routes a failed notification or write to a coordinator for manual completion. |
 | F11 | While awaiting the guide's response, a correlated withdrawal message triggers compensation to release the reserved guide slot, records the withdrawal, and closes the case. |
 
-### Task and gateway choices
+### How the model is arranged
 
 - **User tasks** represent work done by students, coordinators, and the committee. The Faculty Guide responds through correlated messages so acceptance, decline, timeout, and withdrawal can race at an event-based gateway.
 - **Service tasks** represent system work and publish notifications. Their `zeebe:taskDefinition` job types identify the workers that must perform the work.
@@ -42,9 +42,9 @@ The happy path starts with a student team proposal, checks its form and team rul
 
 ## Assignment 2 - Logistics & Shipment Exception Management
 
-The happy path books and validates the parcel, charges and schedules pickup, collects and scans the parcel, runs physical movement alongside a tracking update, then completes last-mile delivery, proof of delivery, invoicing, and closure.
+The normal route starts with booking and parcel validation, followed by payment and pickup scheduling. After collection and scanning, parcel movement and a tracking update run in parallel. The process then handles delivery, proof of delivery, invoicing, and closure.
 
-| ID | Failure and modeled resolution |
+| ID | What can go wrong and how the process handles it |
 |---|---|
 | E1 | An absent shipper or parcel increments the pickup counter. Pickup is rescheduled up to two times; exhaustion cancels the booking and applies the cancellation fee. |
 | E2 | Booking address/details can be corrected up to two times. If an address problem appears at the door, the agent contacts the recipient; an approved change is priced and delivery is retried, otherwise the parcel is returned. |
@@ -57,7 +57,7 @@ The happy path books and validates the parcel, charges and schedules pickup, col
 | E9 | A scan error boundary event sends the hub supervisor to record the scan manually and reconcile tracking records. |
 | E10 | While the transit event gateway is active after dispatch, a cancellation message stops movement, returns the parcel, and triggers fee compensation less the dispatch charge. |
 
-### Task and gateway choices
+### How the model is arranged
 
 - **User tasks** cover shipper corrections, pickup, proof of delivery, recipient confirmation, and claims decisions.
 - **Business rule tasks** validate bookings and determine insurance eligibility. **Service tasks** schedule and route work, update scans, handle claims, and close invoices. **Send tasks** publish notifications/tracking updates; the **receive task** waits for customs documents.
@@ -66,9 +66,9 @@ The happy path books and validates the parcel, charges and schedules pickup, col
 - **Event-based gateways** wait for the first movement, delay, cancellation, parcel-found, or redelivery event that occurs. Timer catches model the relevant service deadlines.
 - **Compensation** reverses the shipment fee, retaining the dispatch charge, when a dispatched shipment is cancelled.
 
-## Camunda 8 execution notes
+## Before running these models
 
-The BPMN models are deployable process definitions, but a deployed instance will wait at each service/business/send task until a worker completes its job. The repository contains the diagrams and execution contract; it does not include worker application code or forms. Before running end-to-end, register workers for the job types listed in each XML file and configure user-task forms/assignments for the target identity groups.
+Deploying these files creates the process definitions. To run them from start to finish, workers are needed for the service, business rule, and send tasks. This older exercise folder contains the diagrams and the variables they expect, but no worker application or forms. Register workers for the job types in the XML and set up the user-task forms and assignments before running a full case.
 
 Start Assignment 1 with a unique `proposalId` and variables used by its gateways, such as `formValid`, `teamRulesValid`, `proposalAttempts`, `similarityScore`, `similarityThreshold`, `similarityDisposition`, `committeeDecision`, `revisionCycles`, `finalCommitteeDecision`, `newTopicUsed`, `guideAvailable`, `guideAllocationPlan`, `guideAttempts`, and `manualGuideAvailable`. Workers update the counters and decision variables before the process reaches the corresponding gateways.
 
@@ -76,5 +76,4 @@ Start Assignment 2 with a unique `shipmentId`, `shipmentOutcome="continue"`, and
 
 Messages are correlated using `proposalId` or `shipmentId` as shown in the BPMN message subscriptions. Message producers must use the exact message names in the XML. The logistics parallel gateway waits for both the movement path and the independent pickup tracking/notification path to finish before last-mile processing begins.
 
-The process files intentionally omit fixed candidate-group IDs: configure those to match the Identity groups in the Camunda environment where the diagrams will be deployed.
-
+Candidate groups are not fixed in the files. Set them to the groups used in your own Camunda environment.

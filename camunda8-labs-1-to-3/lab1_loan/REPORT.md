@@ -1,36 +1,44 @@
-# Lab 1 - Loan approval
+# Lab 1: Loan approval
 
-## Architecture and route
+## What the process does
 
-The `loan-validate` Spring worker checks required fields. Invalid details end as rejected. Valid details go to a REST credit assessment using synthetic data. The `loan_eligibility` DMN table returns `Approved`, `Rejected`, or `Manual Review`. A Tasklist user task resolves manual review using `reviewApproved`. The diagram has 13 elements, with one main flow and three outcome branches.
+This process checks a loan application and either approves it, rejects it, or asks for a manual review. The main route goes from applicant validation to a credit check and then to the DMN decision.
 
-## Educational decision rules
+The `loan-validate` Java worker checks the applicant reference, income, and requested amount. Invalid details go straight to the rejected end event. Valid applications call the mock credit API. The `loan_eligibility` decision table then returns Approved, Rejected, or Manual Review.
 
-Reject missing eligibility, income below 2000, or credit score below 550. Review income 2000-3999, score 550-699, or a requested amount above twelve monthly incomes. Approve income at least 4000, score at least 700, and amount at most twelve monthly incomes. The final catch-all is manual review. These thresholds are synthetic teaching rules, not financial advice.
+If a review is needed, the process waits for the reviewer in Tasklist. Setting `reviewApproved` to true approves the application; setting it to false rejects it.
+
+## Decision rules
+
+These are simple rules chosen for the exercise. A failed validation, income below 2000, or a credit score below 550 leads to rejection. Income from 2000 to 3999, a score from 550 to 699, or a loan above twelve months of income leads to review. Approval needs income of at least 4000, a score of at least 700, and a loan within that income limit. Any remaining case goes to review. The table checks rules from top to bottom using FIRST hit policy.
 
 ## Variables
 
 | Variable | Type | Purpose |
 |---|---|---|
-| applicantRef | string | Synthetic applicant identifier |
+| applicantRef | string | Made-up applicant reference |
 | requestedAmount | number | Loan amount |
-| monthlyIncome | number | Synthetic monthly income |
+| monthlyIncome | number | Income used in the test |
 | validationOk | boolean | Worker validation result |
 | creditResponse.body.score | number | Mock REST credit score |
-| loanDecision | string | DMN classification |
-| reviewApproved | boolean | Tasklist reviewer choice |
-| failWorker, simulateApiError | boolean | Incident tests |
+| loanDecision | string | Result from the decision table |
+| reviewApproved | boolean | Decision entered by the reviewer |
+| failWorker, simulateApiError | boolean | Flags used to cause test failures |
 
-## API example
+## Example API call
 
 `POST http://localhost:8085/mock/credit` with `{"applicantRef":"A-100","monthlyIncome":5000,"requestedAmount":10000,"simulateError":false}` returns `{"score":740,"assessment":"SYNTHETIC"}`.
 
-## How to explain the diagram
+## Testing and results
 
-Follow the main line from application to validation, credit REST call, and DMN decision. The first gateway rejects incomplete details. The decision gateway approves, rejects, or sends the case to a single human review task. That review has its own yes/no end events.
+All five planned cases passed: approval, rejection, manual review, a credit API error, and a worker failure. The original review test was completed through the user-task API. A later review was assigned and completed in Tasklist with `reviewApproved=true`, ending as Approved after review.
 
-## Actual results and limitations
+For the failure demonstration, `failWorker=true` made the validation worker fail until its retries ran out. Operate showed the incident at Validate applicant. After the flag was changed to false and Retry was selected, the same instance continued through the credit check and ended as Approved.
 
-All five cases in `test_cases.csv` were run on local Camunda 8. The normal approval and DMN rejection completed directly. The manual case created a user task, then finished as **Approved after review** when completed through the local user-task API. Both the synthetic credit API error and worker failure created incidents; after correcting the input and retrying, both ended **Approved**. Instance IDs and dates are in `../evidence/run_results.csv`. The credit service is deterministic and educational; it does not check a real bureau.
+The [test table](test_cases.csv) contains the inputs and outcomes. The [main results](../evidence/run_results.csv) have the original instance IDs. The later Tasklist review is instance `2251799813784665`, and the incident/recovery pair is `2251799813787883`.
 
-The [actual completed-instance screenshot](../evidence/screenshots/lab1_loan_completed.png) shows the approved route, history, and variables. A fresh review instance `2251799813784665` was assigned and completed in Tasklist with `reviewApproved=true`. The final incident screenshot shows worker failure in instance `2251799813787883`; after changing `failWorker` to false and selecting Retry in Operate, that same instance completed as Approved. [Tasklist](../evidence/screenshots/lab1_tasklist_review.jpg), [incident](../evidence/screenshots/lab1_worker_incident.jpg), and [recovery](../evidence/screenshots/lab1_worker_recovered.jpg) captures are included.
+Screenshots: [normal approval](../evidence/screenshots/lab1_loan_completed.png), [Tasklist review](../evidence/screenshots/lab1_tasklist_review.jpg), [worker incident](../evidence/screenshots/lab1_worker_incident.jpg), and [recovery](../evidence/screenshots/lab1_worker_recovered.jpg).
+
+## Limitations
+
+The credit API returns a fixed score based on the test income. It does not contact a credit bureau, and the thresholds are only for this classroom example.

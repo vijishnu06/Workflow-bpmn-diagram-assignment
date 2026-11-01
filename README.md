@@ -1,74 +1,25 @@
-# BPMN Process Modeling — Assignment Submission
+# BPMN and Camunda assignments
 
-The new [Camunda 8 practical labs 1–3](camunda8-labs-1-to-3/) contain loan approval, e-commerce fulfilment, and hospital appointment workflows, each with BPMN, DMN, Spring Boot source, API examples, reports, and recorded test results. Sixteen synthetic tests completed their expected routes, including five incident/recovery tests. Actual screenshots now cover successful execution, assigned Tasklist review, incident investigation, and recovery for all three labs. The [evidence index](camunda8-labs-1-to-3/evidence/README.md) links each capture to its instance ID; nine additional demonstration runs also completed successfully.
+This repository brings together the BPMN assignments completed for the course. The latest work is in [Camunda 8 Labs 1–3](camunda8-labs-1-to-3/): loan approval, order processing, and hospital appointments.
 
-The repository includes the original three introductory BPMN 2.0 models below, plus two Camunda 8 executable assignment models. The `ex3/` folder contains **Assignment 1: Student Project Approval & Allocation** and **Assignment 2: Logistics & Shipment Exception Management**, with failure path registers and Camunda 8 execution notes in its README. The `.bpmn` files open in Camunda Modeler.
+Each lab has its BPMN and DMN files, Java workers, test inputs, results, and a short report. The [screenshots](camunda8-labs-1-to-3/evidence/README.md) show the processes running in Camunda, including human reviews and recovery from failed jobs. All 16 main tests and nine additional demonstration runs completed.
 
-## Repository Structure
+## Where to find the work
 
-```
-├── README.md
-├── scenario1_leave_approval.bpmn
-├── scenario2_purchase_order.bpmn
-├── scenario3_it_service_request.bpmn
-├── camunda8-labs-1-to-3/
-│   ├── README.md
-│   ├── API_EXAMPLES.md
-│   ├── SUBMISSION_CHECKLIST.md
-│   ├── lab1_loan/
-│   ├── lab2_order/
-│   ├── lab3_appointment/
-│   ├── src/
-│   └── evidence/
-└── ex3/
-    ├── README.md
-    ├── assignment1_student_project_approval.bpmn
-    └── assignment2_logistics_shipment_exception.bpmn
-```
+| Folder or file | Contents |
+|---|---|
+| [camunda8-labs-1-to-3](camunda8-labs-1-to-3/) | The three practical labs, source code, reports, and test evidence |
+| [ex3](ex3/) | Student project approval and logistics exception management |
+| [scenario1_leave_approval.bpmn](scenario1_leave_approval.bpmn) | Employee leave approval |
+| [scenario2_purchase_order.bpmn](scenario2_purchase_order.bpmn) | Online purchase order processing |
+| [scenario3_it_service_request.bpmn](scenario3_it_service_request.bpmn) | IT service requests |
 
----
+Open the `.bpmn` and `.dmn` files in Camunda Modeler. The practical labs have their own [setup instructions](camunda8-labs-1-to-3/README.md).
 
-## Scenario 1: Employee Leave Approval
-**File:** `scenario1_leave_approval.bpmn`
+## Earlier BPMN exercises
 
-The process begins with a **Start Event** when the employee submits a leave request. The HR system then performs a **Task** to check the employee's leave balance. This feeds into an **Exclusive Gateway** ("Sufficient Balance?"):
+**Leave approval:** The system checks the employee's leave balance before sending the request to a manager. Insufficient balance closes the request with a notification. If the manager approves, the balance is updated and an approval is sent; otherwise, a rejection is sent. The three outcomes have separate end events.
 
-- **No** → the system sends an insufficient-balance notification and the process ends (**End Event: Insufficient Balance**).
-- **Yes** → the request is forwarded to the manager for approval (**Task**), which leads to a second **Exclusive Gateway** ("Manager Decision?"):
-  - **Approved** → the system updates the employee's leave balance and sends an approval notification, ending at **End Event: Approved**.
-  - **Rejected** → the system sends a rejection notification, ending at **End Event: Rejected**.
+**Purchase order:** The process checks stock, then payment. An unavailable product or a failed payment ends the order with the appropriate notification. A successful payment leads to order confirmation, preparation, shipping, and a shipping confirmation.
 
-This models three distinct process outcomes (approved, rejected, insufficient balance), each with its own End Event, as required.
-
----
-
-## Scenario 2: Online Purchase Order Processing
-**File:** `scenario2_purchase_order.bpmn`
-
-The process starts when a customer places an order (**Start Event**). The system checks product availability (**Task**), feeding into an **Exclusive Gateway** ("Product Available?"):
-
-- **No** → the customer is notified the product is out of stock, and the process ends (**End Event: Out of Stock**).
-- **Yes** → the system processes payment (**Task**), leading to a second **Exclusive Gateway** ("Payment Successful?"):
-  - **Fail** → the customer is notified of the payment failure, ending the process (**End Event: Payment Failed**).
-  - **Success** → the order is confirmed and prepared for shipment, then shipped, then a shipping confirmation is sent to the customer — ending at **End Event: Order Shipped**.
-
-This demonstrates multiple process paths driven by two sequential decision points (availability, then payment), each with an appropriate terminating End Event.
-
----
-
-## Scenario 3: IT Service Request
-**File:** `scenario3_it_service_request.bpmn`
-
-The process begins when an employee reports an IT problem (**Start Event**). The employee submits an IT support request (**Task**), the help desk registers the request (**Task**), and then checks the severity of the problem (**Task**), which feeds an **Exclusive Gateway** ("Severity Level?"):
-
-- **Low** → the request is assigned to a support technician.
-- **High** → the request is assigned to a senior technician.
-
-Both branches converge on a common **Task** ("Technician Investigates Problem"), followed by another **Exclusive Gateway** ("Can be Resolved?"):
-
-- **Yes** → the technician fixes the problem internally.
-- **No** → the technician escalates the problem to the external service provider.
-
-Both alternative resolution paths converge again, after which the help desk updates the request status, sends a resolution notification to the employee, and the process ends at a single **End Event: Request Closed**.
-
-This models two independent decision points (severity, then resolvability) with converging (merging) paths,a common real-world BPMN pattern in addition to simple branching.
+**IT service request:** The help desk registers the problem and checks its severity. Low-severity cases go to a support technician, while high-severity cases go to a senior technician. After investigation, the problem is either fixed internally or sent to an external provider. Both routes return to a status update and a resolution notice before the request closes.

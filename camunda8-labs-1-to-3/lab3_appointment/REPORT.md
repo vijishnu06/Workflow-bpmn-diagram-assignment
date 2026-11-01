@@ -1,38 +1,48 @@
-# Lab 3 - Hospital appointment and triage
+# Lab 3: Hospital appointments and triage
 
-## Architecture and route
+## What the process does
 
-The `patient-validate` worker checks synthetic registration fields. The `patient_triage` DMN table returns `Routine`, `Priority Review`, or `Urgent Assessment`. Urgent requests immediately reach a Tasklist staff assessment and end as assessed. Other requests call the mock scheduling REST API. Priority cases or cases without slots reach Tasklist review. A selected slot is booked by a worker; otherwise the process ends with no slot.
+This process checks a made-up appointment request, assigns a triage category, and either books a slot or sends the request to staff.
 
-## Educational triage rules
+The `patient-validate` worker checks the patient reference, appointment preference, and symptoms summary. Incomplete requests end as Invalid request. Valid requests go to the `patient_triage` DMN table.
 
-An emergency indicator or severe symptoms is Urgent Assessment. Otherwise a priority indicator is Priority Review; all other complete requests are Routine. These rules are invented for class demonstration and must not be used for real patient triage.
+Urgent requests go straight to Immediate staff assessment in Tasklist. Other requests call the mock scheduling API. A Routine request with an available slot is booked directly. Priority requests and requests without slots go to Staff scheduling review. Staff can select a slot to book or finish the case as No slot available.
+
+## Triage rules
+
+An emergency indicator or severe symptoms gives Urgent Assessment. If neither is present but the priority indicator is true, the result is Priority Review. If all three indicators are false, the result is Routine. The rules are checked in that order using FIRST hit policy. They are classroom rules for synthetic requests, not clinical triage guidance.
 
 ## Variables
 
 | Variable | Type | Purpose |
 |---|---|---|
-| patientRef | string | Synthetic patient identifier |
+| patientRef | string | Made-up patient reference |
 | appointmentPreference, symptomsSummary | string | Request details |
 | emergencyIndicator, severeSymptoms, priorityIndicator | boolean | DMN inputs |
 | registrationValid | boolean | Worker validation result |
-| triageCategory | string | DMN classification |
+| triageCategory | string | Result from the decision table |
 | slotResponse.body.slots | list | Mock API availability |
-| slotSelected | boolean | Tasklist staff choice |
+| slotSelected | boolean | Whether staff selected a slot |
 | selectedSlot | string | Selected appointment time |
 | bookingStatus | string | Worker result |
-| failRegistrationWorker, simulateSchedulingError | boolean | Incident tests |
+| failRegistrationWorker, simulateSchedulingError | boolean | Flags used to cause test failures |
 
-## API example
+## Example API call
 
 `POST http://localhost:8085/mock/slots` with `{"patientRef":"P-100","appointmentPreference":"morning","simulateError":false}` returns a synthetic `slots` list. Preference `none` returns an empty list.
 
-## How to explain the diagram
+## Testing and results
 
-Follow registration and the DMN triage decision. Urgent requests go straight to staff assessment. Other requests call the slot REST service. A routine request with a slot books directly; priority or no-slot requests pause for staff review before booking or ending without a slot.
+All five planned cases passed: routine booking, priority review, urgent assessment, no available slots, and a scheduling API failure. Registration was checked by the Java worker, and the separate REST connector requested the appointment slots.
 
-## Actual results and limitations
+The original human tasks were completed through the user-task API. For the screenshots, a fresh priority request was assigned in Tasklist. Staff completed it with `slotSelected=true` and the existing test slot, and the process ended as Appointment booked.
 
-All five cases in `test_cases.csv` were run on local Camunda 8. Routine booking, priority review, urgent assessment, and no-slot review reached their expected end events. Human tasks were completed through the local user-task API. The scheduling API failure created an incident; after correction and retry it completed as **Appointment booked**. Instance IDs and dates are in `../evidence/run_results.csv`. Registration validation is performed by the worker; the separate REST connector performs the availability request. No real patient data or live hospital system is involved.
+For the failure case, the scheduling API returned HTTP 503. After `simulateError` was set to false in the failed task's saved request body and the process flag was corrected, Retry was selected in Operate. The same request then received a slot and completed the booking.
 
-The [actual completed-instance screenshot](../evidence/screenshots/lab3_appointment_completed.png) shows the booked route, history, and booking variables. A fresh priority review instance `2251799813784785` was assigned and completed in Tasklist with `slotSelected=true`. The final scheduling incident capture shows HTTP 503 in instance `2251799813787933`. After correcting `body.simulateError` and the root error flag, Retry was selected in Operate and the same instance completed as Appointment booked. [Tasklist](../evidence/screenshots/lab3_tasklist_review.jpg), [incident](../evidence/screenshots/lab3_scheduling_incident.jpg), [error details](../evidence/screenshots/lab3_scheduling_error_details.jpg), and [recovery](../evidence/screenshots/lab3_scheduling_recovered.jpg) captures are included.
+The [test table](test_cases.csv) and [main results](../evidence/run_results.csv) list the original runs. The later staff review is instance `2251799813784785`, and the scheduling incident/recovery pair is `2251799813787933`.
+
+Screenshots: [normal booking](../evidence/screenshots/lab3_appointment_completed.png), [Tasklist review](../evidence/screenshots/lab3_tasklist_review.jpg), [scheduling incident](../evidence/screenshots/lab3_scheduling_incident.jpg), [HTTP 503 details](../evidence/screenshots/lab3_scheduling_error_details.jpg), and [recovery](../evidence/screenshots/lab3_scheduling_recovered.jpg).
+
+## Limitations
+
+The service returns a fixed test slot or an empty list. It is not connected to a hospital, and the data does not describe real patients.
